@@ -2,14 +2,13 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { sbBrowser } from "../../lib/supabase/browser";
 
-export type NumberStatus = "available" | "pending" | "reserved" | "expired";
+export type NumberStatus = "available" | "reserved" | "expired";
 
 export interface PublicNumber {
   id: number;
   round_id: number;
   n: number;
   status: NumberStatus;
-  pending_until: string | null;
   is_winner: boolean;
 }
 
@@ -31,9 +30,9 @@ export interface FeedEntry {
   n: number;
   status: string;
   is_winner: boolean;
+  /** Holder/payout wallet — same address post-token-gating migration. */
   sender_wallet: string | null;
   reserved_at: string | null;
-  deposit_signature: string | null;
   payout_signature: string | null;
   payout_status: string | null;
 }
@@ -116,8 +115,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
         { event: "*", schema: "public", table: "numbers", filter: `round_id=eq.${round.id}` },
         (payload) => {
           const row = payload.new as (PublicNumber & {
-            sender_wallet?: string | null;
-            tx_signature?: string | null;
+            payout_wallet?: string | null;
+            holding_wallet?: string | null;
             reserved_at?: string | null;
           }) | null;
           if (!row) return;
@@ -127,7 +126,6 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
               round_id: row.round_id,
               n: row.n,
               status: row.status,
-              pending_until: row.pending_until,
               is_winner: row.is_winner ?? false,
             };
             const idx = prev.findIndex((p) => p.n === safe.n);
@@ -145,9 +143,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
                 n: row.n,
                 status: row.status,
                 is_winner: row.is_winner ?? false,
-                sender_wallet: row.sender_wallet ?? null,
+                sender_wallet: row.payout_wallet ?? row.holding_wallet ?? null,
                 reserved_at: row.reserved_at ?? null,
-                deposit_signature: row.tx_signature ?? null,
                 payout_signature: prev.find((e) => e.n === row.n)?.payout_signature ?? null,
                 payout_status: prev.find((e) => e.n === row.n)?.payout_status ?? null,
               };

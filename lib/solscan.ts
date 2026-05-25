@@ -16,6 +16,11 @@ export function solscanAddr(address: string, cluster: SolanaCluster): string {
   return `https://solscan.io/account/${address}${clusterQuery(cluster)}`;
 }
 
+/** Block explorer page for a Solana blockhash (used as the lotto draw seed). */
+export function solscanBlock(blockhash: string, cluster: SolanaCluster): string {
+  return `https://solscan.io/block/${blockhash}${clusterQuery(cluster)}`;
+}
+
 export function shortAddr(addr: string | null | undefined): string {
   if (!addr) return "—";
   if (addr.length <= 11) return addr;

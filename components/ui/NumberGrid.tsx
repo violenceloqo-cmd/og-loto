@@ -10,7 +10,6 @@ function classFor(num: PublicNumber, mine: boolean, isWinner: boolean): string {
   if (isWinner) return "bg-gold text-black ring-4 ring-cherry animate-pulse-gold border-cherryDark";
   if (mine && num.status === "reserved") return "bg-mine text-cream border-cherryDark";
   if (num.status === "reserved") return "bg-cherry text-cream cursor-not-allowed border-cherryDark";
-  if (num.status === "pending") return "bg-sunshine text-cherryDark cursor-not-allowed animate-shake border-cherryDark";
   return "bg-cream text-cherryDark hover:bg-banana hover:-translate-y-0.5 border-cherryDark";
 }
 

@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Luckiest_Guy, Fredoka } from "next/font/google";
-import { PAYOUT_SOL, RESERVATION_SOL } from "../lib/lotto/constants";
+import { MIN_TOKEN_HOLDING_UI, PAYOUT_SOL, TOKEN_TICKER } from "../lib/lotto/constants";
 
 const display = Luckiest_Guy({
   weight: "400",
@@ -18,8 +18,8 @@ const body = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "LOTTO COIN — Pick Your Lucky Number!",
-  description: `Live Solana lottery — 5-minute rounds, 100 numbers, ${RESERVATION_SOL} SOL to play, ${PAYOUT_SOL} SOL per winning number.`,
+  title: "$LOTTO — Pick Your Lucky Number!",
+  description: `Live Solana lottery — 5-minute rounds, 100 numbers, hold ${MIN_TOKEN_HOLDING_UI.toLocaleString()} $${TOKEN_TICKER} to play, ${PAYOUT_SOL} SOL per winning number.`,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

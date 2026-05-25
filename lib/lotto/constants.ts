@@ -1,9 +1,11 @@
-// Shared lotto economics + timing (safe for client and server).
+// Shared lotto economics + token-gating (safe for client and server).
 
-/** Cost to reserve one number for a round. */
-export const RESERVATION_SOL = 0.01;
-export const RESERVATION_LAMPORTS = 10_000_000;
+/** Payout per winning number. */
+export const PAYOUT_SOL = 1;
+export const PAYOUT_LAMPORTS = 1_000_000_000;
 
-/** Payout per winning number the player reserved. */
-export const PAYOUT_SOL = 0.1;
-export const PAYOUT_LAMPORTS = 100_000_000;
+/** Minimum UI amount of the project token a wallet must hold to enter. */
+export const MIN_TOKEN_HOLDING_UI = 100_000;
+
+/** Display ticker for the project token. Cosmetic only. */
+export const TOKEN_TICKER = "LOTTO";

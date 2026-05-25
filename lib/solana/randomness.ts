@@ -1,8 +1,8 @@
-// Derive 9 distinct winning numbers in [1,100] from a Solana blockhash.
+// Derive 5 distinct winning numbers in [1,100] from a Solana blockhash.
 // Pure function — no I/O — so it's trivially testable.
 import { createHash } from "node:crypto";
 
-export const WINNERS_PER_ROUND = 9;
+export const WINNERS_PER_ROUND = 5;
 
 /**
  * Deterministic rejection-sampling:
@@ -23,8 +23,7 @@ export function drawWinningNumbers(blockhash: string, count = WINNERS_PER_ROUND)
     }
     const v = (seed[offset] << 8) | seed[offset + 1];
     offset += 2;
-    // Rejection sampling to avoid modulo bias against the top of 65536/100
-    const cap = 65500; // 65500 % 100 === 0
+    const cap = 65500;
     if (v >= cap) continue;
     const pick = (v % 100) + 1;
     if (!winners.includes(pick)) winners.push(pick);

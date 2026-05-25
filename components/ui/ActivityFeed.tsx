@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRealtime, type FeedEntry } from "../providers/RealtimeProvider";
 import { solscanAddr, solscanTx, shortAddr, shortSig } from "../../lib/solscan";
 import { cn } from "../../lib/utils";
+import { PAYOUT_SOL } from "../../lib/lotto/constants";
 
 const CLUSTER = (process.env.NEXT_PUBLIC_SOLANA_CLUSTER ?? "mainnet-beta") as
   | "mainnet-beta"
@@ -222,16 +223,13 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
       )}
 
       <div className="ml-auto flex flex-wrap items-center gap-1.5">
-        {entry.deposit_signature && (
-          <a
-            href={solscanTx(entry.deposit_signature, CLUSTER)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded border-2 border-cherryDark/60 bg-cream px-1.5 py-0.5 font-display text-[10px] text-cherryDark tracking-wider hover:bg-banana"
-            title="Reservation tx on Solscan"
+        {!winner && (
+          <span
+            className="rounded border-2 border-cherryDark/60 bg-cream px-1.5 py-0.5 font-display text-[10px] text-cherryDark tracking-wider"
+            title="Token-holder pick"
           >
-            BET ↗
-          </a>
+            HOLDER
+          </span>
         )}
         {winner && entry.payout_signature && (
           <a
@@ -241,7 +239,7 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
             className="rounded border-2 border-ink bg-lime px-1.5 py-0.5 font-display text-[10px] text-ink tracking-wider shadow-hardSm hover:bg-lime/80"
             title="Payout tx on Solscan"
           >
-            WON +0.1 SOL ↗
+            WON +{PAYOUT_SOL} SOL ↗
           </a>
         )}
         {winner && !entry.payout_signature && (

@@ -41,7 +41,6 @@ function ballColors(n: number, status: NumberStatus, mine: boolean, isWinner: bo
   if (isWinner) return { fill: "#fbbf24", rim: "#7c2d12", text: "#1a0a02" };
   if (mine && status === "reserved") return { fill: "#16a34a", rim: "#14532d", text: "#fff" };
   if (status === "reserved") return { fill: "#dc2626", rim: "#7f1d1d", text: "#fff4c4" };
-  if (status === "pending") return { fill: "#fbbf24", rim: "#7c2d12", text: "#7f1d1d" };
   // Available — alternate a couple of cream/blue/pink hues so the drum is colorful.
   const cycle = n % 4;
   if (cycle === 0) return { fill: "#fff4c4", rim: "#7f1d1d", text: "#7f1d1d" };
@@ -127,11 +126,15 @@ export function LottoMachine2D() {
     let raf = 0;
     let last = performance.now();
     let stirAngle = 0;
+    // Drum rotates continuously so the chamber visibly spins.
+    let drumAngle = 0;
+    const drumSpin = 0.45; // radians per second (slow tumble)
 
     const step = (now: number) => {
       const dt = Math.min(0.033, (now - last) / 1000);
       last = now;
       stirAngle += dt * 1.6;
+      drumAngle += dt * drumSpin;
 
       const live = liveRef.current;
 
@@ -143,8 +146,8 @@ export function LottoMachine2D() {
 
       // Pedestal positions at the bottom of the canvas (for fly-out).
       const pedY = ch - 56;
-      const pedCount = 9;
-      const pedSpacing = Math.min(72, (cw - 60) / pedCount);
+      const pedCount = 5;
+      const pedSpacing = Math.min(90, (cw - 60) / pedCount);
       const pedStartX = drumCx - (pedSpacing * (pedCount - 1)) / 2;
       const pedestals: Array<{ x: number; y: number }> = [];
       for (let i = 0; i < pedCount; i++) {
@@ -210,26 +213,32 @@ export function LottoMachine2D() {
           continue;
         }
 
-        // Stirring force — tangential to drum center, plus a chaotic wobble.
+        // Gentle stirring — tangential nudge that follows the drum spin so
+        // balls drift around but still fall through the middle.
         const dx = b.x - drumCx;
         const dy = b.y - drumCy;
         const d = Math.hypot(dx, dy) || 1;
         const tx = -dy / d;
         const ty = dx / d;
-        const stir = 180 + 80 * Math.sin(stirAngle * 1.3 + b.n);
+        const stir = 90 + 40 * Math.sin(stirAngle * 1.1 + b.n);
         b.vx += tx * stir * dt;
         b.vy += ty * stir * dt;
-        // gravity
-        b.vy += 380 * dt;
-        // damping
+        // Gravity dominates — balls fall from the top of the drum, get
+        // carried up the spinning side, then tumble back down through middle.
+        b.vy += 320 * dt;
         b.vx *= 0.992;
         b.vy *= 0.992;
+        // Keep some minimum tumble rotation so numbers wobble visibly.
+        if (Math.abs(b.rotationSpeed) < 1.2) {
+          b.rotationSpeed += (Math.random() - 0.5) * 0.5;
+        }
 
         b.x += b.vx * dt;
         b.y += b.vy * dt;
         b.rotation += b.rotationSpeed * dt;
 
-        // Drum wall collision.
+        // Drum wall collision — bounce inward and pick up the rotating
+        // wall's tangential velocity so the ball is carried with the spin.
         const ndx = b.x - drumCx;
         const ndy = b.y - drumCy;
         const nd = Math.hypot(ndx, ndy);
@@ -241,9 +250,16 @@ export function LottoMachine2D() {
           const vn = b.vx * nx + b.vy * ny;
           b.vx -= 1.7 * vn * nx;
           b.vy -= 1.7 * vn * ny;
-          b.vx *= 0.72;
-          b.vy *= 0.72;
-          b.rotationSpeed += (Math.random() - 0.5) * 2;
+          b.vx *= 0.7;
+          b.vy *= 0.7;
+          // Wall is moving tangentially at drumSpin * drumR — light friction
+          // drags the ball along with it, but not enough to pin it there.
+          const wallTx = -ny;
+          const wallTy = nx;
+          const wallSpeed = drumSpin * drumR;
+          b.vx += wallTx * wallSpeed * 0.15;
+          b.vy += wallTy * wallSpeed * 0.15;
+          b.rotationSpeed += (Math.random() - 0.5) * 2 + drumSpin * 0.3;
         }
       }
 
@@ -349,10 +365,10 @@ export function LottoMachine2D() {
       ctx.strokeStyle = "#1a0a02";
       ctx.stroke();
 
-      // gold bolts around the rim
+      // gold bolts around the rim — rotate with the drum.
       const boltCount = 16;
       for (let i = 0; i < boltCount; i++) {
-        const a = (i / boltCount) * Math.PI * 2;
+        const a = (i / boltCount) * Math.PI * 2 + drumAngle;
         const bx = Math.cos(a) * (drumR + 13);
         const by = Math.sin(a) * (drumR + 13);
         ctx.beginPath();
@@ -360,6 +376,25 @@ export function LottoMachine2D() {
         ctx.fillStyle = "#7c2d12";
         ctx.fill();
       }
+
+      // Internal spokes/paddles inside the chamber to sell the spin —
+      // drawn under the balls (clipped to chamber circle).
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(0, 0, drumR - 1, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.rotate(drumAngle);
+      ctx.strokeStyle = "rgba(124, 45, 18, 0.35)";
+      ctx.lineWidth = 3;
+      const spokeCount = 6;
+      for (let i = 0; i < spokeCount; i++) {
+        ctx.rotate((Math.PI * 2) / spokeCount);
+        ctx.beginPath();
+        ctx.moveTo(drumR * 0.15, 0);
+        ctx.lineTo(drumR * 0.95, 0);
+        ctx.stroke();
+      }
+      ctx.restore();
 
       ctx.restore();
 

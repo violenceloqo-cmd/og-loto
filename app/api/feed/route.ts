@@ -9,9 +9,8 @@ interface FeedRow {
   n: number;
   status: string;
   is_winner: boolean;
-  sender_wallet: string | null;
+  sender_wallet: string | null; // holder/payout wallet (the same wallet, post-migration)
   reserved_at: string | null;
-  deposit_signature: string | null;
   payout_signature: string | null;
   payout_status: string | null;
 }
@@ -51,9 +50,6 @@ export async function GET() {
     current = { round_id: live.id, picks: (rows ?? []) as FeedRow[] };
   }
 
-  // Pull a generous window of recently completed rounds, then keep only the
-  // ones that actually had reservations so the UI never shows empty "ghost"
-  // rounds with 0 picks / 0 winners.
   const { data: completed } = await client
     .from("rounds")
     .select("id, status, ends_at, winning_numbers, draw_blockhash")

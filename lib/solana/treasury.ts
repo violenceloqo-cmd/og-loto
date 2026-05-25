@@ -1,6 +1,6 @@
 // Treasury keypair loader (server-only).
 import "server-only";
-import { Keypair, PublicKey } from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
 import { env } from "../env";
 
@@ -24,16 +24,4 @@ export function treasury(): Keypair {
 
 export function treasuryAddress(): string {
   return treasury().publicKey.toBase58();
-}
-
-// Destination address for swept deposits. Defaults to the treasury if
-// RECEIVE_WALLET_ADDRESS is not configured.
-export function receiveAddress(): string {
-  const raw = env.RECEIVE_WALLET_ADDRESS.trim();
-  if (!raw) return treasuryAddress();
-  try {
-    return new PublicKey(raw).toBase58();
-  } catch {
-    throw new Error("RECEIVE_WALLET_ADDRESS is not a valid Solana address");
-  }
 }

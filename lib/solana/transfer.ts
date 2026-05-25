@@ -9,13 +9,10 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import { connection } from "./connection";
-import {
-  PAYOUT_LAMPORTS,
-  RESERVATION_LAMPORTS,
-} from "../lotto/constants";
+import { PAYOUT_LAMPORTS } from "../lotto/constants";
 
 export const SOL = LAMPORTS_PER_SOL;
-export { RESERVATION_LAMPORTS, PAYOUT_LAMPORTS };
+export { PAYOUT_LAMPORTS };
 
 export interface SendResult {
   signature: string;

@@ -1,9 +1,8 @@
-// Round lifecycle: create new round, populate 100 number rows, register Helius webhook.
+// Round lifecycle: create a new round + populate 100 number rows.
+// Under the token-gated model there are no per-number deposit addresses
+// and no Helius webhook to register — both functions are deliberately tiny.
 import "server-only";
 import { sb } from "../supabase/server";
-import { deriveAllForRound } from "../solana/derive";
-import { createHeliusWebhook } from "../helius/webhooks";
-import { env } from "../env";
 
 const ROUND_MS = 5 * 60 * 1000;
 
@@ -24,12 +23,9 @@ export async function createRound(opts: { startsAt: Date }): Promise<bigint> {
   if (error || !data) throw new Error(`createRound failed: ${error?.message}`);
   const roundId = BigInt(data.id);
 
-  const derived = deriveAllForRound(roundId);
-  const rows = derived.map((d) => ({
+  const rows = Array.from({ length: 100 }, (_, i) => ({
     round_id: Number(roundId),
-    n: d.n,
-    deposit_address: d.address,
-    derivation_index: d.index,
+    n: i + 1,
     status: "available" as const,
   }));
   const { error: insertErr } = await sb().from("numbers").insert(rows);
@@ -38,24 +34,11 @@ export async function createRound(opts: { startsAt: Date }): Promise<bigint> {
   return roundId;
 }
 
-/** Move 'upcoming' → 'active' and register the Helius webhook for its 100 addresses. */
+/** Move 'upcoming' → 'active'. */
 export async function activateRound(roundId: bigint): Promise<void> {
-  const { data: rows, error } = await sb()
-    .from("numbers")
-    .select("deposit_address")
-    .eq("round_id", Number(roundId));
-  if (error) throw new Error(`load addresses failed: ${error.message}`);
-  const addresses = (rows ?? []).map((r) => r.deposit_address as string);
-  if (addresses.length !== 100) {
-    throw new Error(`expected 100 addresses for round ${roundId}, got ${addresses.length}`);
-  }
-
-  const webhookUrl = `${env.APP_URL.replace(/\/$/, "")}/api/webhook/helius`;
-  const webhookId = await createHeliusWebhook({ addresses, webhookUrl });
-
-  const { error: updErr } = await sb()
+  const { error } = await sb()
     .from("rounds")
-    .update({ status: "active", helius_webhook_id: webhookId })
+    .update({ status: "active" })
     .eq("id", Number(roundId));
-  if (updErr) throw new Error(`activate update failed: ${updErr.message}`);
+  if (error) throw new Error(`activate update failed: ${error.message}`);
 }

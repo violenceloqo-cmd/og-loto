@@ -1,48 +1,62 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { QRCodeCanvas } from "qrcode.react";
+import { useRef, useState } from "react";
 import { useRealtime } from "../providers/RealtimeProvider";
-import { PAYOUT_SOL, RESERVATION_SOL } from "../../lib/lotto/constants";
+import { MIN_TOKEN_HOLDING_UI, PAYOUT_SOL, TOKEN_TICKER } from "../../lib/lotto/constants";
 
 interface Props {
   n: number;
   onClose: () => void;
 }
 
-type Step = "form" | "awaiting" | "reserved" | "error";
+type Step = "form" | "reserved" | "error";
+
+interface ReserveResponse {
+  ok?: boolean;
+  error?: string;
+  ui_amount?: number;
+  required?: number;
+}
+
+function fmtAmount(x: number | undefined): string {
+  if (typeof x !== "number" || !Number.isFinite(x)) return "0";
+  return x.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+
+function errorMessage(json: ReserveResponse): string {
+  switch (json.error) {
+    case "insufficient_holding":
+      return `This wallet only holds ${fmtAmount(json.ui_amount)} $${TOKEN_TICKER}. You need at least ${MIN_TOKEN_HOLDING_UI.toLocaleString()} to enter.`;
+    case "wallet_already_picked":
+      return "This wallet already reserved a number this round. One pick per wallet per round.";
+    case "already_taken":
+      return "Someone grabbed that number a split-second before you. Pick another.";
+    case "round_closing":
+      return "Too late — this round is wrapping up. Hang tight for the next one.";
+    case "round_not_active":
+      return "Round isn't accepting picks right now.";
+    case "bad_holding_wallet":
+      return "That doesn't look like a valid Solana address.";
+    case "holding_check_failed":
+      return "Couldn't read your token balance from Solana. Try again in a moment.";
+    case "turnstile_failed":
+      return "Bot check failed. Refresh and try again.";
+    default:
+      return json.error ?? "Something went wrong. Try again.";
+  }
+}
 
 export function ReservationModal({ n, onClose }: Props) {
-  const { round, numbers, myNumbers, rememberMine } = useRealtime();
-  const [payoutWallet, setPayoutWallet] = useState("");
+  const { round, rememberMine } = useRealtime();
+  const [holdingWallet, setHoldingWallet] = useState("");
   const [step, setStep] = useState<Step>("form");
-  const [deposit, setDeposit] = useState<string | null>(null);
-  const [pendingUntil, setPendingUntil] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const submittedRef = useRef(false);
-
-  useEffect(() => {
-    if (step !== "awaiting") return;
-    const row = numbers.find((x) => x.n === n);
-
-    if (row?.status === "reserved") {
-      if (round) rememberMine(round.id, n);
-      setStep("reserved");
-      return;
-    }
-
-    // Trust pending_until from /api/reserve until it passes. Realtime can briefly
-    // still show "available" before the pending update arrives — that is not expiry.
-    const stillValid =
-      !!pendingUntil && Date.now() < new Date(pendingUntil).getTime();
-    if (stillValid) return;
-
-    setError("Reservation expired before payment. Please try again.");
-    setStep("error");
-  }, [numbers, n, step, round, rememberMine, pendingUntil]);
 
   async function submit() {
     if (!round || submittedRef.current) return;
     submittedRef.current = true;
+    setSubmitting(true);
     setError(null);
     try {
       const res = await fetch("/api/reserve", {
@@ -51,24 +65,25 @@ export function ReservationModal({ n, onClose }: Props) {
         body: JSON.stringify({
           round_id: round.id,
           n,
-          payout_wallet: payoutWallet.trim(),
+          holding_wallet: holdingWallet.trim(),
           turnstile_token: "",
         }),
       });
-      const json = (await res.json()) as { ok?: boolean; error?: string; deposit_address?: string; pending_until?: string };
+      const json = (await res.json()) as ReserveResponse;
       if (!res.ok || !json.ok) {
-        setError(json.error ?? "reservation failed");
+        setError(errorMessage(json));
         setStep("error");
         submittedRef.current = false;
         return;
       }
-      setDeposit(json.deposit_address ?? null);
-      setPendingUntil(json.pending_until ?? null);
-      setStep("awaiting");
+      rememberMine(round.id, n);
+      setStep("reserved");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setStep("error");
       submittedRef.current = false;
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -101,68 +116,40 @@ export function ReservationModal({ n, onClose }: Props) {
           {step === "form" && (
             <>
               <p className="mb-3 text-sm font-medium text-cherryDark">
-                Drop the Solana wallet where you want your{" "}
-                <span className="font-display text-cherry">{PAYOUT_SOL} SOL</span> winnings sent.
-                You&apos;ll get a one-time deposit address for{" "}
-                <span className="font-display">{RESERVATION_SOL} SOL</span>.
+                Paste the Solana wallet that holds at least{" "}
+                <span className="font-display text-cherry">
+                  {MIN_TOKEN_HOLDING_UI.toLocaleString()} ${TOKEN_TICKER}
+                </span>
+                . We&apos;ll send your{" "}
+                <span className="font-display text-cherry">{PAYOUT_SOL} SOL</span> winnings to this
+                same wallet if your number gets drawn.
               </p>
               <label className="mb-1 block font-display text-xs tracking-widest text-cherry">
-                ★ PAYOUT WALLET ★
+                ★ HOLDING WALLET ★
               </label>
               <input
-                value={payoutWallet}
-                onChange={(e) => setPayoutWallet(e.target.value)}
+                value={holdingWallet}
+                onChange={(e) => setHoldingWallet(e.target.value)}
                 className="mb-4 w-full rounded-lg border-4 border-ink bg-white px-3 py-2 font-mono text-sm text-cherryDark outline-none placeholder:text-cherryDark/40 focus:border-cherry"
                 placeholder="Your Solana address…"
+                spellCheck={false}
+                autoCapitalize="none"
+                autoCorrect="off"
               />
               <button
                 onClick={submit}
-                disabled={payoutWallet.trim().length < 30 || !round}
+                disabled={holdingWallet.trim().length < 30 || !round || submitting}
                 className="w-full rounded-xl border-4 border-ink bg-cherry py-3 font-display text-xl tracking-wider text-cream shadow-hardSm transition-transform hover:-translate-y-0.5 hover:bg-cherryDark disabled:bg-cherry/40 disabled:shadow-none disabled:hover:translate-y-0"
               >
-                ★ CONTINUE ★
+                {submitting ? "★ CHECKING… ★" : "★ CLAIM NUMBER ★"}
               </button>
               {!round && (
                 <p className="mt-3 text-center text-xs font-medium text-cherryDark/70">
                   Waiting for the next round to spin up…
                 </p>
               )}
-            </>
-          )}
-
-          {step === "awaiting" && deposit && (
-            <>
-              <p className="mb-3 text-sm font-medium">
-                Send exactly{" "}
-                <span className="font-display text-cherry">{RESERVATION_SOL} SOL</span> to the address
-                below from any Solana wallet.
-                Reservation expires at{" "}
-                <span className="font-mono font-bold">
-                  {new Date(pendingUntil ?? Date.now()).toLocaleTimeString()}
-                </span>
-                .
-              </p>
-              <div className="mb-4 flex justify-center rounded-xl border-4 border-ink bg-white p-3">
-                <QRCodeCanvas value={`solana:${deposit}?amount=${RESERVATION_SOL}`} size={180} />
-              </div>
-              <div className="mb-3">
-                <label className="mb-1 block font-display text-xs tracking-widest text-cherry">
-                  ★ DEPOSIT ADDRESS ★
-                </label>
-                <div className="flex items-stretch gap-2">
-                  <code className="flex-1 break-all rounded-lg border-2 border-ink bg-white p-2 font-mono text-xs text-cherryDark">
-                    {deposit}
-                  </code>
-                  <button
-                    onClick={() => navigator.clipboard.writeText(deposit)}
-                    className="rounded-lg border-2 border-ink bg-banana px-3 font-display text-xs text-cherryDark shadow-hardSm hover:bg-sunshine"
-                  >
-                    COPY
-                  </button>
-                </div>
-              </div>
-              <p className="text-center font-display text-xs tracking-widest text-cherry animate-pulse">
-                ★ WAITING FOR PAYMENT ★
+              <p className="mt-3 text-center text-[11px] font-medium text-cherryDark/70">
+                One pick per wallet per round. No fees, no deposit — just hold the bag.
               </p>
             </>
           )}
@@ -174,7 +161,8 @@ export function ReservationModal({ n, onClose }: Props) {
                 NUMBER #{n} IS YOURS!
               </p>
               <p className="mb-4 text-center text-sm font-medium text-cherryDark/80">
-                Good luck — drawing happens when the timer hits zero. 🍀
+                Good luck — drawing happens when the timer hits zero. If you win, {PAYOUT_SOL} SOL
+                lands in your wallet automatically. 🍀
               </p>
               <button
                 onClick={onClose}
@@ -188,19 +176,24 @@ export function ReservationModal({ n, onClose }: Props) {
           {step === "error" && (
             <>
               <p className="mb-4 text-sm font-medium text-cherry">{error}</p>
-              <button
-                onClick={onClose}
-                className="w-full rounded-xl border-4 border-ink bg-banana py-3 font-display text-xl tracking-wider text-cherryDark shadow-hardSm hover:-translate-y-0.5"
-              >
-                CLOSE
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setError(null);
+                    setStep("form");
+                  }}
+                  className="flex-1 rounded-xl border-4 border-ink bg-banana py-3 font-display text-lg tracking-wider text-cherryDark shadow-hardSm hover:-translate-y-0.5"
+                >
+                  TRY AGAIN
+                </button>
+                <button
+                  onClick={onClose}
+                  className="flex-1 rounded-xl border-4 border-ink bg-cream py-3 font-display text-lg tracking-wider text-cherryDark shadow-hardSm hover:-translate-y-0.5"
+                >
+                  CLOSE
+                </button>
+              </div>
             </>
-          )}
-
-          {myNumbers.size >= 5 && step === "form" && (
-            <p className="mt-3 text-center text-xs font-medium text-cherry">
-              ⚠ You already have 5 numbers this round. Extra payments will be refunded.
-            </p>
           )}
         </div>
       </div>
