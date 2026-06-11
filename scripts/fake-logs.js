@@ -82,7 +82,7 @@ const TEMPLATES = [
   () =>
     `auth declined reason=${rand(["insufficient_funds", "velocity_limit", "merchant_blocked", "geo_mismatch"])} card=${maskCard()} attempt=${randInt(1, 4)}`,
   () =>
-    `solana rpc ok endpoint=${rand(["api.mainnet-beta", "rpc.helius", "rpc.triton"])} slot=${randInt(245_000_000, 260_000_000)} latency=${randInt(38, 220)}ms`,
+    `solana rpc ok endpoint=${rand(["mainnet.helius", "rpc.helius", "rpc.triton"])} slot=${randInt(245_000_000, 260_000_000)} latency=${randInt(38, 220)}ms`,
   () =>
     `block scanned slot=${randInt(245_000_000, 260_000_000)} txs=${randInt(800, 3400)} matched=${randInt(0, 6)} took=${randInt(110, 480)}ms`,
   () =>
@@ -124,7 +124,7 @@ function startupBanner() {
     `${ts()}  INFO  [bootstrap] starting card-platform node=node-${randInt(1, 12)} region=${rand(["us-east-1", "eu-central-1", "ap-southeast-1"])}`,
     `${ts()}  INFO  [bootstrap] config loaded env=production features=card.v3,sol.payments,no-kyc`,
     `${ts()}  INFO  [bootstrap] connected db=primary pool=20 latency=${randInt(2, 12)}ms`,
-    `${ts()}  INFO  [bootstrap] solana rpc connected cluster=mainnet-beta slot=${randInt(245_000_000, 260_000_000)}`,
+    `${ts()}  INFO  [bootstrap] solana rpc connected cluster=mainnet slot=${randInt(245_000_000, 260_000_000)}`,
     `${ts()}  INFO  [bootstrap] kms ready keys=4 rotation=ok`,
     `${ts()}  INFO  [bootstrap] issuer api handshake ok partner=internal-bin sandbox=false`,
     `${ts()}  INFO  [bootstrap] ready listening=0.0.0.0:8080`,

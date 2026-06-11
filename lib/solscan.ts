@@ -1,6 +1,7 @@
 // Solscan link + address formatting helpers. Safe for client and server.
+import type { SolanaCluster } from "./solana/cluster";
 
-export type SolanaCluster = "mainnet-beta" | "devnet" | "testnet" | string;
+export type { SolanaCluster };
 
 function clusterQuery(cluster: SolanaCluster): string {
   if (cluster === "devnet") return "?cluster=devnet";

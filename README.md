@@ -74,7 +74,7 @@ In production, Vercel Cron runs `/api/cron/tick` every minute automatically (con
 4. Run `npm run dev`, hit `/api/cron/tick` once to start a round.
 5. Pick a number in the browser and paste the test wallet. Confirm the number flips to `reserved` instantly.
 6. Wait 5 minutes. Verify the `active → completed` transition in `rounds`, and that a payout tx for any winning number appears on the devnet explorer.
-7. Flip `NEXT_PUBLIC_SOLANA_CLUSTER=mainnet-beta` and use your real pump.fun mint for production.
+7. Flip `NEXT_PUBLIC_SOLANA_CLUSTER=mainnet` and use your real pump.fun mint for production.
 
 ## Files
 

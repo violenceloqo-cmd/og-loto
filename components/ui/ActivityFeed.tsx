@@ -4,11 +4,9 @@ import { useRealtime, type FeedEntry } from "../providers/RealtimeProvider";
 import { solscanAddr, solscanTx, shortAddr, shortSig } from "../../lib/solscan";
 import { cn } from "../../lib/utils";
 import { PAYOUT_SOL } from "../../lib/lotto/constants";
+import { parseSolanaCluster } from "../../lib/solana/cluster";
 
-const CLUSTER = (process.env.NEXT_PUBLIC_SOLANA_CLUSTER ?? "mainnet-beta") as
-  | "mainnet-beta"
-  | "devnet"
-  | "testnet";
+const CLUSTER = parseSolanaCluster(process.env.NEXT_PUBLIC_SOLANA_CLUSTER);
 
 interface PastRound {
   id: number;

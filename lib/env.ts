@@ -1,5 +1,6 @@
 // Centralized env access. Server-only secrets throw if accessed in the browser.
 import "server-only";
+import { isDevnet, parseSolanaCluster, type SolanaCluster } from "./solana/cluster";
 
 function required(name: string): string {
   const v = process.env[name];
@@ -10,10 +11,7 @@ function required(name: string): string {
 export const env = {
   SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
   SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  SOLANA_CLUSTER: (process.env.NEXT_PUBLIC_SOLANA_CLUSTER || "mainnet-beta") as
-    | "mainnet-beta"
-    | "devnet"
-    | "testnet",
+  SOLANA_CLUSTER: parseSolanaCluster(process.env.NEXT_PUBLIC_SOLANA_CLUSTER) as SolanaCluster,
 
   get SUPABASE_SERVICE_ROLE_KEY() { return required("SUPABASE_SERVICE_ROLE_KEY"); },
   get TREASURY_PRIVATE_KEY()      { return required("TREASURY_PRIVATE_KEY"); },
@@ -32,10 +30,10 @@ export const env = {
 
 export function rpcUrl(): string {
   if (env.HELIUS_API_KEY) {
-    const cluster = env.SOLANA_CLUSTER === "devnet" ? "devnet" : "mainnet";
+    const cluster = isDevnet(env.SOLANA_CLUSTER) ? "devnet" : "mainnet";
     return `https://${cluster}.helius-rpc.com/?api-key=${env.HELIUS_API_KEY}`;
   }
-  return env.SOLANA_CLUSTER === "devnet"
+  return isDevnet(env.SOLANA_CLUSTER)
     ? "https://api.devnet.solana.com"
-    : "https://api.mainnet-beta.solana.com";
+    : "https://api.mainnet-beta.solana.com"; // Solana's public mainnet RPC hostname
 }
