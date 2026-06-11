@@ -128,7 +128,7 @@ function PastTab({ past, loading }: { past: PastRound[]; loading: boolean }) {
     return <EmptyState>Loading…</EmptyState>;
   }
   if (past.length === 0) {
-    return <EmptyState>No past rounds with picks yet</EmptyState>;
+    return <EmptyState>No completed rounds yet</EmptyState>;
   }
   return (
     <div className="max-h-96 space-y-3 overflow-y-auto pr-1">
@@ -169,12 +169,33 @@ function PastRoundGroup({ round }: { round: PastRound }) {
           )}
         </div>
       </div>
-      <ul className="space-y-1.5 p-2">
-        {sorted.map((e) => {
-          const isWinner = winnersSet.has(e.n) || e.is_winner;
-          return <FeedRow key={e.number_id} entry={{ ...e, is_winner: isWinner }} />;
-        })}
-      </ul>
+      {round.winning_numbers && round.winning_numbers.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-white/[0.05] px-3 py-2">
+          <span className="mr-1 font-display text-[10px] font-medium uppercase tracking-wider text-mist">
+            Winning numbers
+          </span>
+          {round.winning_numbers.map((n) => (
+            <span
+              key={n}
+              className="flex h-6 w-6 items-center justify-center rounded-lg bg-gold-gradient font-display text-[11px] font-bold text-abyss"
+            >
+              {n}
+            </span>
+          ))}
+        </div>
+      )}
+      {sorted.length > 0 ? (
+        <ul className="space-y-1.5 p-2">
+          {sorted.map((e) => {
+            const isWinner = winnersSet.has(e.n) || e.is_winner;
+            return <FeedRow key={e.number_id} entry={{ ...e, is_winner: isWinner }} />;
+          })}
+        </ul>
+      ) : (
+        <div className="px-3 py-3 text-center font-display text-[11px] font-medium tracking-wide text-mist/60">
+          No picks this round
+        </div>
+      )}
     </div>
   );
 }

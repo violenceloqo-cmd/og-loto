@@ -21,9 +21,9 @@ import { PAYOUT_LAMPORTS } from "../lotto/constants";
  *  is force-completed. Belt-and-suspenders. */
 const ROUND_STUCK_AFTER_MS = 15 * 60 * 1000;
 /** After a round completes, give the UI time to drop all winning balls into
- *  their pedestals (~5s) and let players see the winners (~13s extra) before
+ *  their pedestals (~5s) and let players see the winners (~25s extra) before
  *  the next round becomes active. */
-export const REVEAL_DELAY_MS = 18 * 1000;
+export const REVEAL_DELAY_MS = 30 * 1000;
 
 type RoundStatus = "upcoming" | "active" | "completed";
 

@@ -26,6 +26,9 @@ interface PastRound {
 
 const PAST_ROUND_LIMIT = 5;
 
+/** Mirror of the reveal-window cap in /api/round/current. */
+const RECENT_COMPLETED_MAX_AGE_MS = 10 * 60 * 1000;
+
 export async function GET() {
   const client = sb();
 
@@ -37,17 +40,40 @@ export async function GET() {
     .limit(1)
     .maybeSingle();
 
+  const { data: latestCompleted } = await client
+    .from("rounds")
+    .select("id, status, ends_at")
+    .eq("status", "completed")
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  // Keep "current" pointed at the just-completed round during the reveal
+  // window (same logic as /api/round/current) so winners + payout links stay
+  // visible in the activity feed instead of snapping to an empty new round.
+  let currentRoundId: number | null = live?.id ?? null;
+  if (latestCompleted) {
+    const endedRecently =
+      Date.now() - new Date(latestCompleted.ends_at).getTime() < RECENT_COMPLETED_MAX_AGE_MS;
+    const nextStarted =
+      !!live &&
+      (live.status !== "upcoming" || Date.now() >= new Date(live.starts_at).getTime());
+    if (endedRecently && !nextStarted) {
+      currentRoundId = latestCompleted.id as number;
+    }
+  }
+
   let current: { round_id: number | null; picks: FeedRow[] } = {
-    round_id: live?.id ?? null,
+    round_id: currentRoundId,
     picks: [],
   };
-  if (live?.id) {
+  if (currentRoundId) {
     const { data: rows } = await client
       .from("public_feed")
       .select("*")
-      .eq("round_id", live.id)
+      .eq("round_id", currentRoundId)
       .order("reserved_at", { ascending: false });
-    current = { round_id: live.id, picks: (rows ?? []) as FeedRow[] };
+    current = { round_id: currentRoundId, picks: (rows ?? []) as FeedRow[] };
   }
 
   const { data: completed } = await client
@@ -72,7 +98,8 @@ export async function GET() {
     }
     for (const r of completed) {
       const picks = byRound.get(r.id as number) ?? [];
-      if (picks.length === 0) continue;
+      // Include rounds without picks too — winning numbers + draw proof are
+      // still worth showing in the history.
       past.push({
         id: r.id as number,
         status: r.status as string,
