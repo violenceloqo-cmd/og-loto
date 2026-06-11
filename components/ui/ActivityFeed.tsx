@@ -49,15 +49,15 @@ export function ActivityFeed() {
   }, [tab, round?.id]);
 
   return (
-    <div className="rounded-2xl border-4 border-ink bg-cream p-4 shadow-hardLg">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-display text-xl text-cherry tracking-wide">ACTIVITY</h2>
-        <div className="flex gap-1 rounded-md border-2 border-ink bg-banana p-0.5">
+    <div className="glass rounded-3xl p-5 shadow-glass sm:p-6">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="font-display text-lg font-semibold tracking-tight text-frost">Activity</h2>
+        <div className="flex gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
           <TabButton active={tab === "current"} onClick={() => setTab("current")}>
-            CURRENT
+            Current
           </TabButton>
           <TabButton active={tab === "past"} onClick={() => setTab("past")}>
-            PAST ROUNDS
+            Past rounds
           </TabButton>
         </div>
       </div>
@@ -85,10 +85,11 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "px-2 py-0.5 font-display text-xs tracking-wider transition-colors rounded",
+        "rounded-full px-3 py-1 font-display text-xs font-medium transition-colors",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-aqua",
         active
-          ? "bg-cherry text-cream shadow-hardSm"
-          : "text-cherryDark hover:bg-cream/60"
+          ? "bg-accent-gradient text-abyss"
+          : "text-mist hover:text-frost"
       )}
     >
       {children}
@@ -96,13 +97,17 @@ function TabButton({
   );
 }
 
+function EmptyState({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-8 text-center font-display text-xs font-medium tracking-wide text-mist">
+      {children}
+    </div>
+  );
+}
+
 function CurrentTab({ feed }: { feed: FeedEntry[] }) {
   if (feed.length === 0) {
-    return (
-      <div className="rounded-xl border-2 border-dashed border-cherryDark/40 bg-cream/60 px-3 py-6 text-center font-display text-xs tracking-widest text-cherryDark/70">
-        ★ NO PICKS YET — BE THE FIRST ★
-      </div>
-    );
+    return <EmptyState>No picks yet — be the first</EmptyState>;
   }
   // Winners first, then newest reservations.
   const sorted = feed.slice().sort((a, b) => {
@@ -122,18 +127,10 @@ function CurrentTab({ feed }: { feed: FeedEntry[] }) {
 
 function PastTab({ past, loading }: { past: PastRound[]; loading: boolean }) {
   if (loading && past.length === 0) {
-    return (
-      <div className="rounded-xl border-2 border-dashed border-cherryDark/40 bg-cream/60 px-3 py-6 text-center font-display text-xs tracking-widest text-cherryDark/70">
-        LOADING…
-      </div>
-    );
+    return <EmptyState>Loading…</EmptyState>;
   }
   if (past.length === 0) {
-    return (
-      <div className="rounded-xl border-2 border-dashed border-cherryDark/40 bg-cream/60 px-3 py-6 text-center font-display text-xs tracking-widest text-cherryDark/70">
-        ★ NO PAST ROUNDS WITH PICKS YET ★
-      </div>
-    );
+    return <EmptyState>No past rounds with picks yet</EmptyState>;
   }
   return (
     <div className="max-h-96 space-y-3 overflow-y-auto pr-1">
@@ -154,24 +151,22 @@ function PastRoundGroup({ round }: { round: PastRound }) {
   });
   const winnerCount = sorted.filter((p) => winnersSet.has(p.n) || p.is_winner).length;
   return (
-    <div className="rounded-xl border-2 border-ink bg-cream/60">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-ink bg-banana px-3 py-1.5">
-        <div className="font-display text-sm text-cherryDark tracking-wide">
-          ROUND #{round.id}
-        </div>
+    <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.02]">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.07] bg-white/[0.03] px-3 py-2">
+        <div className="font-display text-sm font-semibold text-frost">Round #{round.id}</div>
         <div className="flex items-center gap-2">
-          <span className="rounded border-2 border-ink bg-lime/80 px-1.5 py-0.5 font-display text-[10px] text-ink tracking-wider">
-            {winnerCount} WINNERS
+          <span className="rounded-full border border-mint/25 bg-mint/10 px-2 py-0.5 font-display text-[10px] font-medium tracking-wide text-mint">
+            {winnerCount} winners
           </span>
           {round.draw_blockhash && (
             <a
               href={solscanAddr(round.draw_blockhash, CLUSTER)}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded border-2 border-ink bg-cream px-1.5 py-0.5 font-display text-[10px] text-cherryDark tracking-wider hover:bg-banana"
+              className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[10px] text-mist transition-colors hover:text-frost"
               title="Draw blockhash on Solscan"
             >
-              SEED {shortSig(round.draw_blockhash)} ↗
+              seed {shortSig(round.draw_blockhash)} ↗
             </a>
           )}
         </div>
@@ -191,18 +186,18 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
   return (
     <li
       className={cn(
-        "flex flex-wrap items-center gap-2 rounded-lg border-2 px-2 py-1.5 text-xs",
+        "flex flex-wrap items-center gap-2.5 rounded-xl border px-2.5 py-2 text-xs",
         winner
-          ? "border-ink bg-lime/40 border-l-[6px] border-l-lime shadow-hardSm"
-          : "border-cherryDark/30 bg-cream/80"
+          ? "border-gold/25 bg-gold/[0.06]"
+          : "border-white/[0.06] bg-white/[0.02]"
       )}
     >
       <span
         className={cn(
-          "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 font-display text-sm",
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg font-display text-sm font-semibold",
           winner
-            ? "border-ink bg-gold text-cherryDark"
-            : "border-cherryDark bg-cream text-cherryDark"
+            ? "bg-gold-gradient text-abyss"
+            : "border border-white/10 bg-white/[0.04] text-frost/80"
         )}
       >
         {entry.n}
@@ -213,22 +208,22 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
           href={solscanAddr(entry.sender_wallet, CLUSTER)}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-mono text-[11px] text-cherryDark underline decoration-dotted underline-offset-2 hover:text-cherry"
+          className="font-mono text-[11px] text-mist underline decoration-white/20 decoration-dotted underline-offset-2 transition-colors hover:text-aqua"
           title={entry.sender_wallet}
         >
           {shortAddr(entry.sender_wallet)}
         </a>
       ) : (
-        <span className="font-mono text-[11px] text-cherryDark/60">unknown</span>
+        <span className="font-mono text-[11px] text-mist/50">unknown</span>
       )}
 
       <div className="ml-auto flex flex-wrap items-center gap-1.5">
         {!winner && (
           <span
-            className="rounded border-2 border-cherryDark/60 bg-cream px-1.5 py-0.5 font-display text-[10px] text-cherryDark tracking-wider"
+            className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 font-display text-[10px] font-medium tracking-wide text-mist"
             title="Token-holder pick"
           >
-            HOLDER
+            Holder
           </span>
         )}
         {winner && entry.payout_signature && (
@@ -236,18 +231,18 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
             href={solscanTx(entry.payout_signature, CLUSTER)}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded border-2 border-ink bg-lime px-1.5 py-0.5 font-display text-[10px] text-ink tracking-wider shadow-hardSm hover:bg-lime/80"
+            className="rounded-full bg-gold-gradient px-2.5 py-0.5 font-display text-[10px] font-bold tracking-wide text-abyss transition-opacity hover:opacity-85"
             title="Payout tx on Solscan"
           >
-            WON +{PAYOUT_SOL} SOL ↗
+            Won +{PAYOUT_SOL} SOL ↗
           </a>
         )}
         {winner && !entry.payout_signature && (
           <span
-            className="rounded border-2 border-ink bg-lime/60 px-1.5 py-0.5 font-display text-[10px] text-ink tracking-wider"
+            className="rounded-full border border-gold/30 bg-gold/10 px-2.5 py-0.5 font-display text-[10px] font-medium tracking-wide text-gold"
             title="Payout pending"
           >
-            WINNER
+            Winner
           </span>
         )}
       </div>

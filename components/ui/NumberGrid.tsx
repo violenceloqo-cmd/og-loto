@@ -7,10 +7,13 @@ interface Props {
 }
 
 function classFor(num: PublicNumber, mine: boolean, isWinner: boolean): string {
-  if (isWinner) return "bg-gold text-black ring-4 ring-cherry animate-pulse-gold border-cherryDark";
-  if (mine && num.status === "reserved") return "bg-mine text-cream border-cherryDark";
-  if (num.status === "reserved") return "bg-cherry text-cream cursor-not-allowed border-cherryDark";
-  return "bg-cream text-cherryDark hover:bg-banana hover:-translate-y-0.5 border-cherryDark";
+  if (isWinner)
+    return "bg-gold-gradient text-abyss font-bold shadow-glowGold animate-pulse-gold border-transparent";
+  if (mine && num.status === "reserved")
+    return "bg-mint/20 text-mint border-mint/40 shadow-glowMint";
+  if (num.status === "reserved")
+    return "bg-iris/15 text-iris/80 border-iris/25 cursor-not-allowed";
+  return "bg-white/[0.04] text-frost/80 border-white/10 hover:bg-aqua/15 hover:text-aqua hover:border-aqua/40 hover:shadow-glowAqua hover:-translate-y-0.5";
 }
 
 export function NumberGrid({ onPick }: Props) {
@@ -40,9 +43,9 @@ export function NumberGrid({ onPick }: Props) {
               type="button"
               disabled
               className={cn(
-                "aspect-square rounded-full border-2 font-display text-base sm:text-lg font-bold tracking-wider",
+                "aspect-square rounded-xl border font-display text-sm sm:text-base font-medium",
                 "flex items-center justify-center",
-                "bg-cream/40 text-cherryDark/50 border-cherryDark/40 cursor-not-allowed"
+                "bg-white/[0.02] text-mist/40 border-white/[0.05] cursor-not-allowed"
               )}
               title="Waiting for the next round to start…"
             >
@@ -61,10 +64,11 @@ export function NumberGrid({ onPick }: Props) {
             disabled={disabled}
             onClick={() => onPick(num.n)}
             className={cn(
-              "aspect-square rounded-full border-2 font-display text-base sm:text-lg font-bold tracking-wider transition-all shadow-hardSm",
+              "aspect-square rounded-xl border font-display text-sm sm:text-base font-medium transition-all duration-150",
               "flex items-center justify-center",
+              "focus-visible:outline focus-visible:outline-2 focus-visible:outline-aqua",
               classFor(num, mine, isWinner),
-              disabled && "opacity-90 shadow-none"
+              disabled && !isWinner && !mine && "opacity-70"
             )}
           >
             {num.n}

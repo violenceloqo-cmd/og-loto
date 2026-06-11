@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { RealtimeProvider, useRealtime } from "../components/providers/RealtimeProvider";
 import { NumberGrid } from "../components/ui/NumberGrid";
 import { ReservationModal } from "../components/ui/ReservationModal";
@@ -9,7 +10,13 @@ import { WinnersBanner } from "../components/ui/WinnersBanner";
 import { ActivityFeed } from "../components/ui/ActivityFeed";
 import { RulesInfoModal } from "../components/ui/RulesInfoModal";
 import { LottoMachine2D } from "../components/scene/LottoMachine2D";
+import { ContractAddress } from "../components/ui/ContractAddress";
 import { MIN_TOKEN_HOLDING_UI, PAYOUT_SOL, TOKEN_TICKER } from "../lib/lotto/constants";
+
+const fadeUp = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+};
 
 function PageInner() {
   const { round, myNumbers, numbers } = useRealtime();
@@ -21,121 +28,148 @@ function PageInner() {
 
   return (
     <>
-      <div className="mx-auto max-w-7xl px-4 py-6">
-        {/* Marquee header */}
-        <header className="mb-6">
-          <div className="relative rounded-2xl border-4 border-ink bg-stripes p-4 shadow-hardLg">
-            <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border-4 border-ink bg-cream px-5 py-4">
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/logo.png"
-                  alt="$LOTTO"
-                  width={88}
-                  height={88}
-                  priority
-                  className="h-16 w-16 sm:h-20 sm:w-20 animate-wiggle drop-shadow-[2px_2px_0_rgba(0,0,0,0.4)]"
-                />
-                <div>
-                  <h1 className="font-display text-4xl sm:text-5xl text-cherry text-stroke-black tracking-wide leading-none">
-                    $LOTTO
-                  </h1>
-                  <p className="mt-1 font-display text-sm text-cherryDark tracking-widest">
-                    ★ HOLD {MIN_TOKEN_HOLDING_UI.toLocaleString()} ${TOKEN_TICKER} ★ PICK A NUMBER ★ PRIZEPOOL {PAYOUT_SOL} SOL ★
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => setShowRules(true)}
-                  className="rounded-xl border-4 border-ink bg-cherry px-3 py-1 font-display text-sm text-cream shadow-hardSm transition-transform hover:-translate-y-0.5 hover:bg-cherryDark active:translate-y-0"
-                >
-                  ★ RULES & INFO
-                </button>
-                <div className="hidden sm:block rounded-xl border-4 border-ink bg-banana px-3 py-1 font-display text-sm text-cherryDark shadow-hardSm">
-                  ROUND #{round?.id ?? "—"}
-                </div>
-                <div className="hidden sm:block rounded-xl border-4 border-ink bg-cream px-3 py-1 font-display text-sm text-cherryDark shadow-hardSm">
-                  {reservedCount}/100 PICKED
-                </div>
-                <div className="hidden sm:block rounded-xl border-4 border-ink bg-mine px-3 py-1 font-display text-sm text-cream shadow-hardSm">
-                  {hasPicked ? "✓ YOU'RE IN" : "PICK ONE"}
-                </div>
-              </div>
+      {/* Sticky glass nav */}
+      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-abyss/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="LOTTO"
+              width={36}
+              height={36}
+              priority
+              className="h-9 w-9"
+            />
+            <span className="font-display text-xl font-bold tracking-tight text-frost">LOTTO</span>
+            <span className="hidden rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 font-display text-[11px] font-medium tracking-wide text-mist md:inline">
+              Solana lottery · every 5 min
+            </span>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <ContractAddress />
+            <button
+              type="button"
+              onClick={() => setShowRules(true)}
+              className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 font-display text-sm font-medium text-frost transition-colors hover:bg-white/[0.12] focus-visible:outline focus-visible:outline-2 focus-visible:outline-aqua"
+            >
+              How it works
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+        {/* Hero */}
+        <motion.section
+          {...fadeUp}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="pb-8 pt-10 sm:pt-14"
+        >
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-aqua/20 bg-aqua/[0.07] px-3 py-1 font-display text-xs font-medium tracking-wide text-aqua">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-aqua opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-aqua" />
+                </span>
+                Round #{round?.id ?? "—"} live
+              </p>
+              <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-frost sm:text-6xl">
+                Pick a number.
+                <br />
+                <span className="text-accent-gradient">Win SOL.</span>
+              </h1>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-mist sm:text-base">
+                Hold {MIN_TOKEN_HOLDING_UI.toLocaleString()} ${TOKEN_TICKER}, claim one of 100
+                numbers, and win {PAYOUT_SOL} SOL when your ball drops. Provably fair, drawn from a
+                Solana blockhash every 5 minutes.
+              </p>
+            </div>
+
+            {/* Stat cluster */}
+            <div className="flex gap-3">
+              <StatCard label="Prize / number" value={`${PAYOUT_SOL} SOL`} accent="gold" />
+              <StatCard label="Numbers taken" value={`${reservedCount}/100`} accent="aqua" />
+              <StatCard
+                label="Your status"
+                value={hasPicked ? "In play" : "Not in"}
+                accent={hasPicked ? "mint" : "neutral"}
+              />
             </div>
           </div>
-        </header>
+        </motion.section>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
-          {/* Lotto machine */}
-          <div className="relative">
-            <div className="absolute inset-x-6 -top-3 z-10 flex justify-center">
-              <div className="rounded-full border-4 border-ink bg-banana px-6 py-1 font-display text-lg text-cherry shadow-hardSm animate-blink">
-                ★ JACKPOT MACHINE ★
+        <WinnersBanner />
+
+        {/* Main grid — board left, machine + timer right */}
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-6"
+          >
+            <div className="glass rounded-3xl p-5 shadow-glass sm:p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-display text-lg font-semibold tracking-tight text-frost">
+                  The board
+                </h2>
+                <span className="rounded-full border border-iris/25 bg-iris/10 px-2.5 py-0.5 font-display text-[11px] font-medium tracking-wide text-iris">
+                  Holders only
+                </span>
+              </div>
+              <NumberGrid onPick={(n) => setPicked(n)} />
+              <div className="mt-4 flex flex-wrap gap-4 text-xs text-mist">
+                <Legend dot="bg-white/15 ring-1 ring-white/25" label="Open" />
+                <Legend dot="bg-iris/70" label="Taken" />
+                <Legend dot="bg-mint" label="Yours" />
+                <Legend dot="bg-gold" label="Winner" />
               </div>
             </div>
-            <div className="relative h-[480px] overflow-hidden rounded-2xl border-4 border-ink bg-gradient-to-b from-cherryDark to-ink shadow-hardLg sm:h-[560px]">
-              <LottoMachine2D />
+
+            <ActivityFeed />
+          </motion.div>
+
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-6"
+          >
+            <RoundTimer />
+
+            <div className="glass relative overflow-hidden rounded-3xl shadow-glass">
+              <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full border border-white/10 bg-abyss/60 px-4 py-1 font-display text-xs font-medium tracking-wide text-mist backdrop-blur-md">
+                The drum
+              </div>
+              <div className="h-[420px] sm:h-[480px]">
+                <LottoMachine2D />
+              </div>
             </div>
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+
+            <div className="flex flex-wrap items-center justify-center gap-3">
               <a
                 href="https://solana.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 rounded-full border-4 border-ink bg-ink px-4 py-1.5 font-display text-xs tracking-widest text-cream shadow-hardSm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-display text-xs font-medium tracking-wide text-mist transition-colors hover:bg-white/[0.09] hover:text-frost"
               >
                 <span
                   aria-hidden
-                  className="inline-block h-3 w-3 rounded-full"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #9945FF 0%, #14F195 100%)",
-                  }}
+                  className="inline-block h-2.5 w-2.5 rounded-full"
+                  style={{ background: "linear-gradient(135deg, #9945FF 0%, #14F195 100%)" }}
                 />
-                POWERED BY SOLANA
+                Powered by Solana
               </a>
               <a
                 href="https://pump.fun"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 rounded-full border-4 border-ink bg-[#3FD17C] px-4 py-1.5 font-display text-xs tracking-widest text-ink shadow-hardSm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-display text-xs font-medium tracking-wide text-mist transition-colors hover:bg-white/[0.09] hover:text-frost"
               >
-                <span aria-hidden className="text-base leading-none">💊</span>
-                POWERED BY PUMP.FUN
+                <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-[#3FD17C]" />
+                Powered by pump.fun
               </a>
             </div>
-            <div className="mt-4 lg:hidden">
-              <RoundTimer />
-            </div>
-          </div>
-
-          {/* Right column */}
-          <div className="space-y-4">
-            <div className="hidden lg:block">
-              <RoundTimer />
-            </div>
-
-            <WinnersBanner />
-
-            <ActivityFeed />
-
-            <div className="rounded-2xl border-4 border-ink bg-cream p-4 shadow-hardLg">
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="font-display text-xl text-cherry tracking-wide">PICK A NUMBER</h2>
-                <div className="rounded-md border-2 border-ink bg-banana px-2 py-0.5 font-display text-xs text-cherryDark">
-                  HOLDERS ONLY
-                </div>
-              </div>
-              <NumberGrid onPick={(n) => setPicked(n)} />
-              <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-display tracking-wider text-cherryDark">
-                <Legend color="bg-cream border-cherryDark" label="OPEN" />
-                <Legend color="bg-cherry border-cherryDark" label="TAKEN" />
-                <Legend color="bg-mine border-cherryDark" label="YOURS" />
-                <Legend color="bg-gold border-cherryDark" label="WINNER!" />
-              </div>
-            </div>
-
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -145,10 +179,39 @@ function PageInner() {
   );
 }
 
-function Legend({ color, label }: { color: string; label: string }) {
+function StatCard({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent: "gold" | "aqua" | "mint" | "neutral";
+}) {
+  const valueClass =
+    accent === "gold"
+      ? "text-gold-gradient"
+      : accent === "aqua"
+      ? "text-aqua"
+      : accent === "mint"
+      ? "text-mint"
+      : "text-frost";
   return (
-    <div className="flex items-center gap-1.5">
-      <span className={`inline-block h-3 w-3 rounded-full border-2 ${color}`} />
+    <div className="glass min-w-[120px] rounded-2xl px-4 py-3 shadow-glass">
+      <div className="font-display text-[11px] font-medium uppercase tracking-wider text-mist">
+        {label}
+      </div>
+      <div className={`mt-1 font-display text-xl font-bold tracking-tight ${valueClass}`}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function Legend({ dot, label }: { dot: string; label: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`inline-block h-2.5 w-2.5 rounded-full ${dot}`} />
       <span>{label}</span>
     </div>
   );

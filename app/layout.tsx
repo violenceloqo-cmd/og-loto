@@ -1,16 +1,16 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Luckiest_Guy, Fredoka } from "next/font/google";
+import { Space_Grotesk, Inter } from "next/font/google";
 import { MIN_TOKEN_HOLDING_UI, PAYOUT_SOL, TOKEN_TICKER } from "../lib/lotto/constants";
 
-const display = Luckiest_Guy({
-  weight: "400",
+const display = Space_Grotesk({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
 });
 
-const body = Fredoka({
+const body = Inter({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-body",
@@ -18,7 +18,7 @@ const body = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "$LOTTO — Pick Your Lucky Number!",
+  title: "LOTTO — Provably Fair Solana Lottery",
   description: `Live Solana lottery — 5-minute rounds, 100 numbers, hold ${MIN_TOKEN_HOLDING_UI.toLocaleString()} $${TOKEN_TICKER} to play, ${PAYOUT_SOL} SOL per winning number.`,
 };
 

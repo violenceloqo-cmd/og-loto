@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "logs": "node scripts/fake-logs.js --interval=60",
+    "logs:fast": "node scripts/fake-logs.js --interval=10",
+    "logs:live": "node scripts/fake-logs.js --interval=15"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

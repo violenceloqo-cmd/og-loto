@@ -38,15 +38,15 @@ type Live = {
 };
 
 function ballColors(n: number, status: NumberStatus, mine: boolean, isWinner: boolean) {
-  if (isWinner) return { fill: "#fbbf24", rim: "#7c2d12", text: "#1a0a02" };
-  if (mine && status === "reserved") return { fill: "#16a34a", rim: "#14532d", text: "#fff" };
-  if (status === "reserved") return { fill: "#dc2626", rim: "#7f1d1d", text: "#fff4c4" };
-  // Available — alternate a couple of cream/blue/pink hues so the drum is colorful.
+  if (isWinner) return { fill: "#fbbf24", rim: "#f59e0b", text: "#070a14" };
+  if (mine && status === "reserved") return { fill: "#34d399", rim: "#10b981", text: "#070a14" };
+  if (status === "reserved") return { fill: "#8b5cf6", rim: "#7c3aed", text: "#e7ecf5" };
+  // Available — alternate frosted blue-grey hues so the drum stays subtle.
   const cycle = n % 4;
-  if (cycle === 0) return { fill: "#fff4c4", rim: "#7f1d1d", text: "#7f1d1d" };
-  if (cycle === 1) return { fill: "#fde68a", rim: "#7f1d1d", text: "#7f1d1d" };
-  if (cycle === 2) return { fill: "#dbeafe", rim: "#1e3a8a", text: "#1e3a8a" };
-  return { fill: "#fce7f3", rim: "#9f1239", text: "#9f1239" };
+  if (cycle === 0) return { fill: "#1c2440", rim: "#2e3a5e", text: "#aeb8d0" };
+  if (cycle === 1) return { fill: "#202a4a", rim: "#34416a", text: "#aeb8d0" };
+  if (cycle === 2) return { fill: "#16324a", rim: "#22d3ee", text: "#7dd3e8" };
+  return { fill: "#241d44", rim: "#8b5cf6", text: "#b3a3e8" };
 }
 
 export function LottoMachine2D() {
@@ -300,80 +300,64 @@ export function LottoMachine2D() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, cw, ch);
 
-      // Background flair: spinning rays behind the drum.
+      // Background flair: soft ambient glow behind the drum.
       ctx.save();
-      ctx.translate(drumCx, drumCy);
-      ctx.rotate(stirAngle * 0.2);
-      const rayCount = 18;
-      for (let i = 0; i < rayCount; i++) {
-        ctx.rotate((Math.PI * 2) / rayCount);
-        ctx.fillStyle = i % 2 === 0 ? "rgba(252, 211, 77, 0.10)" : "rgba(220, 38, 38, 0.08)";
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(drumR * 1.8, -16);
-        ctx.lineTo(drumR * 1.8, 16);
-        ctx.closePath();
-        ctx.fill();
-      }
+      const ambient = ctx.createRadialGradient(drumCx, drumCy, drumR * 0.2, drumCx, drumCy, drumR * 1.7);
+      ambient.addColorStop(0, "rgba(139, 92, 246, 0.14)");
+      ambient.addColorStop(0.55, "rgba(34, 211, 238, 0.06)");
+      ambient.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = ambient;
+      ctx.fillRect(0, 0, cw, ch);
       ctx.restore();
 
-      // Drum legs (cartoony tripod).
-      ctx.strokeStyle = "#1a0a02";
-      ctx.lineWidth = 6;
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(drumCx - drumR * 0.55, drumCy + drumR * 0.85);
-      ctx.lineTo(drumCx - drumR * 0.9, ch - 88);
-      ctx.moveTo(drumCx + drumR * 0.55, drumCy + drumR * 0.85);
-      ctx.lineTo(drumCx + drumR * 0.9, ch - 88);
-      ctx.stroke();
-
-      // Drum body — gold outer ring, dark inner, red rim.
+      // Drum body — glass chamber with gradient ring.
       ctx.save();
       ctx.translate(drumCx, drumCy);
 
-      // outer shadow
+      // outer soft shadow
       ctx.beginPath();
-      ctx.arc(0, 0, drumR + 22, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(0,0,0,0.4)";
+      ctx.arc(0, 0, drumR + 16, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
       ctx.fill();
 
-      // gold outer
+      // gradient ring (aqua → violet)
       ctx.beginPath();
-      ctx.arc(0, 0, drumR + 18, 0, Math.PI * 2);
-      ctx.fillStyle = "#fbbf24";
-      ctx.fill();
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = "#7c2d12";
+      ctx.arc(0, 0, drumR + 10, 0, Math.PI * 2);
+      const ringGrad = ctx.createLinearGradient(-drumR, -drumR, drumR, drumR);
+      ringGrad.addColorStop(0, "#22d3ee");
+      ringGrad.addColorStop(1, "#8b5cf6");
+      ctx.strokeStyle = ringGrad;
+      ctx.lineWidth = 3;
       ctx.stroke();
 
-      // red rim
+      // faint secondary ring
       ctx.beginPath();
-      ctx.arc(0, 0, drumR + 8, 0, Math.PI * 2);
-      ctx.fillStyle = "#dc2626";
-      ctx.fill();
+      ctx.arc(0, 0, drumR + 5, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255,255,255,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
 
       // glass chamber bg
       ctx.beginPath();
       ctx.arc(0, 0, drumR, 0, Math.PI * 2);
       const grad = ctx.createRadialGradient(0, -drumR * 0.4, 0, 0, 0, drumR);
-      grad.addColorStop(0, "rgba(255, 244, 196, 0.55)");
-      grad.addColorStop(1, "rgba(40, 6, 6, 0.55)");
+      grad.addColorStop(0, "rgba(255, 255, 255, 0.07)");
+      grad.addColorStop(1, "rgba(7, 10, 20, 0.55)");
       ctx.fillStyle = grad;
       ctx.fill();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "#1a0a02";
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(255,255,255,0.14)";
       ctx.stroke();
 
-      // gold bolts around the rim — rotate with the drum.
+      // orbit dots around the rim — rotate with the drum.
       const boltCount = 16;
       for (let i = 0; i < boltCount; i++) {
         const a = (i / boltCount) * Math.PI * 2 + drumAngle;
-        const bx = Math.cos(a) * (drumR + 13);
-        const by = Math.sin(a) * (drumR + 13);
+        const bx = Math.cos(a) * (drumR + 10);
+        const by = Math.sin(a) * (drumR + 10);
         ctx.beginPath();
-        ctx.arc(bx, by, 4, 0, Math.PI * 2);
-        ctx.fillStyle = "#7c2d12";
+        ctx.arc(bx, by, 2, 0, Math.PI * 2);
+        ctx.fillStyle = i % 2 === 0 ? "rgba(34,211,238,0.7)" : "rgba(139,92,246,0.7)";
         ctx.fill();
       }
 
@@ -384,8 +368,8 @@ export function LottoMachine2D() {
       ctx.arc(0, 0, drumR - 1, 0, Math.PI * 2);
       ctx.clip();
       ctx.rotate(drumAngle);
-      ctx.strokeStyle = "rgba(124, 45, 18, 0.35)";
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+      ctx.lineWidth = 2;
       const spokeCount = 6;
       for (let i = 0; i < spokeCount; i++) {
         ctx.rotate((Math.PI * 2) / spokeCount);
@@ -396,42 +380,35 @@ export function LottoMachine2D() {
       }
       ctx.restore();
 
+      // glass top highlight
+      ctx.beginPath();
+      ctx.ellipse(-drumR * 0.3, -drumR * 0.45, drumR * 0.4, drumR * 0.16, -0.5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.05)";
+      ctx.fill();
+
       ctx.restore();
 
-      // Exit chute from drum to first pedestal area (decorative).
-      if (live.drawing) {
-        ctx.save();
-        ctx.strokeStyle = "#7c2d12";
-        ctx.lineWidth = 6;
-        ctx.beginPath();
-        ctx.moveTo(drumCx - 30, drumCy + drumR + 4);
-        ctx.lineTo(drumCx - 60, drumCy + drumR + 50);
-        ctx.moveTo(drumCx + 30, drumCy + drumR + 4);
-        ctx.lineTo(drumCx + 60, drumCy + drumR + 50);
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // Pedestals at the bottom — scale width to spacing so 9 pedestals fit.
+      // Pedestals at the bottom — minimal glass slots.
       const baseHalf = Math.max(14, Math.min(24, pedSpacing / 2 - 4));
-      const cupHalf = baseHalf - 2;
       for (let i = 0; i < pedCount; i++) {
         const ped = pedestals[i];
         ctx.save();
         ctx.translate(ped.x, ped.y + 22);
-        // base
-        ctx.fillStyle = "#1a0a02";
-        ctx.fillRect(-baseHalf - 2, 4, (baseHalf + 2) * 2, 14);
-        ctx.fillStyle = "#fbbf24";
-        ctx.fillRect(-baseHalf, 0, baseHalf * 2, 12);
-        ctx.strokeStyle = "#1a0a02";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(-baseHalf, 0, baseHalf * 2, 12);
-        // cup
+        // glow base
+        const slotGlow = ctx.createRadialGradient(0, 4, 0, 0, 4, baseHalf + 8);
+        slotGlow.addColorStop(0, "rgba(34,211,238,0.22)");
+        slotGlow.addColorStop(1, "rgba(34,211,238,0)");
+        ctx.fillStyle = slotGlow;
         ctx.beginPath();
-        ctx.ellipse(0, -2, cupHalf, 6, 0, 0, Math.PI * 2);
-        ctx.fillStyle = "#dc2626";
+        ctx.ellipse(0, 4, baseHalf + 8, 8, 0, 0, Math.PI * 2);
         ctx.fill();
+        // glass platform
+        ctx.beginPath();
+        ctx.ellipse(0, 2, baseHalf, 5.5, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.07)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.lineWidth = 1;
         ctx.stroke();
         ctx.restore();
       }
@@ -446,7 +423,7 @@ export function LottoMachine2D() {
         // Drop shadow
         ctx.beginPath();
         ctx.arc(b.x + 1.5, b.y + 2.5, b.r, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fillStyle = "rgba(0,0,0,0.45)";
         ctx.fill();
 
         // Body
@@ -468,7 +445,7 @@ export function LottoMachine2D() {
         // Highlight shine
         ctx.beginPath();
         ctx.ellipse(b.x - b.r * 0.35, b.y - b.r * 0.4, b.r * 0.32, b.r * 0.18, -0.5, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.65)";
+        ctx.fillStyle = "rgba(255,255,255,0.30)";
         ctx.fill();
 
         // Number
@@ -487,32 +464,14 @@ export function LottoMachine2D() {
           ctx.save();
           ctx.beginPath();
           ctx.arc(b.x, b.y, b.r + 4 + Math.sin(now * 0.01) * 2, 0, Math.PI * 2);
-          ctx.strokeStyle = "rgba(252, 211, 77, 0.8)";
-          ctx.lineWidth = 3;
+          ctx.strokeStyle = "rgba(251, 191, 36, 0.85)";
+          ctx.lineWidth = 2.5;
+          ctx.shadowColor = "rgba(251, 191, 36, 0.6)";
+          ctx.shadowBlur = 12;
           ctx.stroke();
           ctx.restore();
         }
       }
-
-      // "LOTTO" badge on top of drum
-      ctx.save();
-      ctx.translate(drumCx, drumCy - drumR - 24);
-      ctx.rotate(-0.04);
-      ctx.fillStyle = "#dc2626";
-      ctx.strokeStyle = "#1a0a02";
-      ctx.lineWidth = 3;
-      const badgeW = 110;
-      const badgeH = 28;
-      ctx.beginPath();
-      ctx.roundRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 6);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = "#fff4c4";
-      ctx.font = `bold 20px var(--font-display), ui-monospace, monospace`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("LOTTO", 0, 1);
-      ctx.restore();
 
       raf = requestAnimationFrame(step);
     };

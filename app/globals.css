@@ -3,55 +3,79 @@
 @tailwind utilities;
 
 :root {
-  --bg: #2a0606;
-  --fg: #fff4c4;
+  --bg: #070a14;
+  --fg: #e7ecf5;
 }
 
-html, body {
+html,
+body {
   background: var(--bg);
   color: var(--fg);
 }
 
 body {
   font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background-color: #2a0606;
+  background-color: #070a14;
   background-image:
-    radial-gradient(circle at 20% 10%, rgba(252, 211, 77, 0.15), transparent 40%),
-    radial-gradient(circle at 80% 90%, rgba(236, 72, 153, 0.18), transparent 45%),
-    repeating-linear-gradient(45deg, rgba(252, 211, 77, 0.06) 0 18px, rgba(220, 38, 38, 0.06) 18px 36px);
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(139, 92, 246, 0.16), transparent 60%),
+    radial-gradient(ellipse 60% 45% at 85% 5%, rgba(34, 211, 238, 0.12), transparent 55%),
+    radial-gradient(ellipse 70% 60% at 50% 110%, rgba(139, 92, 246, 0.10), transparent 60%);
   background-attachment: fixed;
   min-height: 100vh;
 }
 
 @layer utilities {
-  .text-stroke-black {
-    -webkit-text-stroke: 2px #1a0a02;
-    text-stroke: 2px #1a0a02;
-    paint-order: stroke fill;
+  /* Frosted glass panel */
+  .glass {
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
-  .text-stroke-black-sm {
-    -webkit-text-stroke: 1px #1a0a02;
-    text-stroke: 1px #1a0a02;
-    paint-order: stroke fill;
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+  /* Gradient text */
+  .text-accent-gradient {
+    background: linear-gradient(135deg, #22d3ee 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* Animated shimmer line for live elements */
+  .shimmer-line {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(34, 211, 238, 0.5) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
   }
 }
 
-/* Cheesy marquee light bulbs around panels */
-.marquee-bulbs {
-  position: relative;
+/* Slim scrollbars to match the dark UI */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
 }
-.marquee-bulbs::before {
-  content: "";
-  position: absolute;
-  inset: -10px;
-  border-radius: inherit;
-  background:
-    radial-gradient(circle at 10px 10px, #fde68a 4px, transparent 5px) repeat-x top left / 24px 12px,
-    radial-gradient(circle at 10px 2px, #fde68a 4px, transparent 5px) repeat-x bottom left / 24px 12px,
-    radial-gradient(circle at 10px 10px, #fde68a 4px, transparent 5px) repeat-y top left / 12px 24px,
-    radial-gradient(circle at 2px 10px, #fde68a 4px, transparent 5px) repeat-y top right / 12px 24px;
-  filter: drop-shadow(0 0 4px #fbbf24);
-  animation: marquee-bulbs 1s steps(2) infinite;
-  pointer-events: none;
-  z-index: -1;
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
 }

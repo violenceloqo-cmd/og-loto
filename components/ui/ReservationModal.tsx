@@ -89,113 +89,119 @@ export function ReservationModal({ n, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-abyss/80 p-4 backdrop-blur-md"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl border-4 border-ink bg-stripes p-3 shadow-hardLg"
+        className="glass-strong w-full max-w-md rounded-3xl p-6 shadow-glassLg sm:p-7"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="rounded-xl border-4 border-ink bg-cream p-6 text-cherryDark">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-ink bg-gold font-display text-2xl text-cherryDark shadow-hardSm">
-                {n}
+        <div className="mb-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-gradient font-display text-xl font-bold text-abyss shadow-glowAqua">
+              {n}
+            </span>
+            <h2 className="font-display text-xl font-bold tracking-tight text-frost">
+              Reserve number
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-lg text-mist transition-colors hover:bg-white/[0.1] hover:text-frost"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+
+        {step === "form" && (
+          <>
+            <p className="mb-4 text-sm leading-relaxed text-mist">
+              Paste the Solana wallet that holds at least{" "}
+              <span className="font-semibold text-aqua">
+                {MIN_TOKEN_HOLDING_UI.toLocaleString()} ${TOKEN_TICKER}
               </span>
-              <h2 className="font-display text-2xl text-cherry tracking-wide">RESERVE!</h2>
+              . We&apos;ll send your{" "}
+              <span className="font-semibold text-gold">{PAYOUT_SOL} SOL</span> winnings to this
+              same wallet if your number gets drawn.
+            </p>
+            <label className="mb-1.5 block font-display text-[11px] font-medium uppercase tracking-wider text-mist">
+              Holding wallet
+            </label>
+            <input
+              value={holdingWallet}
+              onChange={(e) => setHoldingWallet(e.target.value)}
+              className="mb-4 w-full rounded-xl border border-white/10 bg-abyss/60 px-3.5 py-3 font-mono text-sm text-frost outline-none transition-colors placeholder:text-mist/40 focus:border-aqua/50 focus:shadow-glowAqua"
+              placeholder="Your Solana address…"
+              spellCheck={false}
+              autoCapitalize="none"
+              autoCorrect="off"
+            />
+            <button
+              onClick={submit}
+              disabled={holdingWallet.trim().length < 30 || !round || submitting}
+              className="w-full rounded-xl bg-accent-gradient py-3.5 font-display text-base font-bold tracking-tight text-abyss shadow-glowAqua transition-all hover:opacity-90 hover:shadow-glowIris disabled:opacity-35 disabled:shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-aqua"
+            >
+              {submitting ? "Checking…" : "Claim number"}
+            </button>
+            {!round && (
+              <p className="mt-3 text-center text-xs text-mist">
+                Waiting for the next round to spin up…
+              </p>
+            )}
+            <p className="mt-3 text-center text-[11px] text-mist/70">
+              One pick per wallet per round. No fees, no deposit — just hold the bag.
+            </p>
+          </>
+        )}
+
+        {step === "reserved" && (
+          <>
+            <div className="mb-4 flex justify-center">
+              <span className="flex h-16 w-16 animate-float items-center justify-center rounded-full bg-mint/15 text-3xl shadow-glowMint">
+                🎉
+              </span>
             </div>
+            <p className="mb-1 text-center font-display text-2xl font-bold tracking-tight text-frost">
+              Number #{n} is yours
+            </p>
+            <p className="mb-5 text-center text-sm leading-relaxed text-mist">
+              Good luck — drawing happens when the timer hits zero. If you win, {PAYOUT_SOL} SOL
+              lands in your wallet automatically.
+            </p>
             <button
               onClick={onClose}
-              className="font-display text-2xl text-cherry hover:text-ink"
-              aria-label="Close"
+              className="w-full rounded-xl bg-mint py-3.5 font-display text-base font-bold tracking-tight text-abyss shadow-glowMint transition-opacity hover:opacity-90"
             >
-              ×
+              Let&apos;s go
             </button>
-          </div>
+          </>
+        )}
 
-          {step === "form" && (
-            <>
-              <p className="mb-3 text-sm font-medium text-cherryDark">
-                Paste the Solana wallet that holds at least{" "}
-                <span className="font-display text-cherry">
-                  {MIN_TOKEN_HOLDING_UI.toLocaleString()} ${TOKEN_TICKER}
-                </span>
-                . We&apos;ll send your{" "}
-                <span className="font-display text-cherry">{PAYOUT_SOL} SOL</span> winnings to this
-                same wallet if your number gets drawn.
-              </p>
-              <label className="mb-1 block font-display text-xs tracking-widest text-cherry">
-                ★ HOLDING WALLET ★
-              </label>
-              <input
-                value={holdingWallet}
-                onChange={(e) => setHoldingWallet(e.target.value)}
-                className="mb-4 w-full rounded-lg border-4 border-ink bg-white px-3 py-2 font-mono text-sm text-cherryDark outline-none placeholder:text-cherryDark/40 focus:border-cherry"
-                placeholder="Your Solana address…"
-                spellCheck={false}
-                autoCapitalize="none"
-                autoCorrect="off"
-              />
+        {step === "error" && (
+          <>
+            <p className="mb-5 rounded-xl border border-coral/25 bg-coral/[0.08] px-4 py-3 text-sm leading-relaxed text-coral">
+              {error}
+            </p>
+            <div className="flex gap-2.5">
               <button
-                onClick={submit}
-                disabled={holdingWallet.trim().length < 30 || !round || submitting}
-                className="w-full rounded-xl border-4 border-ink bg-cherry py-3 font-display text-xl tracking-wider text-cream shadow-hardSm transition-transform hover:-translate-y-0.5 hover:bg-cherryDark disabled:bg-cherry/40 disabled:shadow-none disabled:hover:translate-y-0"
+                onClick={() => {
+                  setError(null);
+                  setStep("form");
+                }}
+                className="flex-1 rounded-xl bg-accent-gradient py-3 font-display text-sm font-bold text-abyss transition-opacity hover:opacity-90"
               >
-                {submitting ? "★ CHECKING… ★" : "★ CLAIM NUMBER ★"}
+                Try again
               </button>
-              {!round && (
-                <p className="mt-3 text-center text-xs font-medium text-cherryDark/70">
-                  Waiting for the next round to spin up…
-                </p>
-              )}
-              <p className="mt-3 text-center text-[11px] font-medium text-cherryDark/70">
-                One pick per wallet per round. No fees, no deposit — just hold the bag.
-              </p>
-            </>
-          )}
-
-          {step === "reserved" && (
-            <>
-              <div className="mb-3 text-center text-6xl animate-wiggle">🎉</div>
-              <p className="mb-1 text-center font-display text-2xl text-cherry">
-                NUMBER #{n} IS YOURS!
-              </p>
-              <p className="mb-4 text-center text-sm font-medium text-cherryDark/80">
-                Good luck — drawing happens when the timer hits zero. If you win, {PAYOUT_SOL} SOL
-                lands in your wallet automatically. 🍀
-              </p>
               <button
                 onClick={onClose}
-                className="w-full rounded-xl border-4 border-ink bg-mine py-3 font-display text-xl tracking-wider text-cream shadow-hardSm hover:-translate-y-0.5"
+                className="flex-1 rounded-xl border border-white/10 bg-white/[0.05] py-3 font-display text-sm font-medium text-frost transition-colors hover:bg-white/[0.1]"
               >
-                ★ LET&apos;S GO ★
+                Close
               </button>
-            </>
-          )}
-
-          {step === "error" && (
-            <>
-              <p className="mb-4 text-sm font-medium text-cherry">{error}</p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setError(null);
-                    setStep("form");
-                  }}
-                  className="flex-1 rounded-xl border-4 border-ink bg-banana py-3 font-display text-lg tracking-wider text-cherryDark shadow-hardSm hover:-translate-y-0.5"
-                >
-                  TRY AGAIN
-                </button>
-                <button
-                  onClick={onClose}
-                  className="flex-1 rounded-xl border-4 border-ink bg-cream py-3 font-display text-lg tracking-wider text-cherryDark shadow-hardSm hover:-translate-y-0.5"
-                >
-                  CLOSE
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
