@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 const CONTRACT_ADDRESS =
-  process.env.NEXT_PUBLIC_LOTTO_TOKEN_MINT ?? "5Dzcc6XKfJKumxWhCo6JBzQZgtSX8LTdhwuNWMKdpump";
+  process.env.NEXT_PUBLIC_LOTTO_TOKEN_MINT ?? "3HVuAR19Zmp9X2U3zVtgPzECggLbgSaKXwGm9pnApump";
 
 function shorten(addr: string) {
   return `${addr.slice(0, 4)}…${addr.slice(-4)}`;
