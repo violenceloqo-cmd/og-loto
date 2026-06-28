@@ -34,15 +34,17 @@ function PageInner() {
           <div className="flex items-center gap-3">
             <Image
               src="/logo.png"
-              alt="LOTTO"
-              width={36}
-              height={36}
+              alt="BULLOTTO"
+              width={44}
+              height={44}
               priority
-              className="h-9 w-9"
+              className="h-11 w-11 rounded-full"
             />
-            <span className="font-display text-xl font-bold tracking-tight text-frost">LOTTO</span>
+            <span className="font-display text-xl font-bold tracking-tight text-frost">
+              BULL<span className="text-accent-gradient">OTTO</span>
+            </span>
             <span className="hidden rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 font-display text-[11px] font-medium tracking-wide text-mist md:inline">
-              Solana lottery · every 5 min
+              Solana bull lottery · every 5 min
             </span>
           </div>
           <div className="flex items-center gap-2.5">
@@ -65,36 +67,60 @@ function PageInner() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="pb-8 pt-10 sm:pt-14"
         >
-          <div className="flex flex-wrap items-end justify-between gap-6">
+          <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
             <div>
               <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-aqua/20 bg-aqua/[0.07] px-3 py-1 font-display text-xs font-medium tracking-wide text-aqua">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-aqua opacity-60" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-aqua" />
                 </span>
-                Round #{round?.id ?? "—"} live
+                Round #{round?.id ?? "—"} live · bull market is on
               </p>
-              <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-frost sm:text-6xl">
-                Pick a number.
+              <h1 className="font-display text-4xl font-bold leading-[1.02] tracking-tight text-frost sm:text-6xl">
+                Run with
+                <br />
+                the bulls.
                 <br />
                 <span className="text-accent-gradient">Win SOL.</span>
               </h1>
               <p className="mt-4 max-w-md text-sm leading-relaxed text-mist sm:text-base">
-                Hold {MIN_TOKEN_HOLDING_UI.toLocaleString()} ${TOKEN_TICKER}, claim one of 100
-                numbers, and win {PAYOUT_SOL} SOL when your ball drops. Provably fair, drawn from a
-                Solana blockhash every 5 minutes.
+                Hold {MIN_TOKEN_HOLDING_UI.toLocaleString()} ${TOKEN_TICKER}, claim one of 100 Ansem
+                bulls, and win {PAYOUT_SOL} SOL when your bull charges out of the pit. Provably fair,
+                drawn from a Solana blockhash every 5 minutes.
               </p>
+
+              {/* Stat cluster */}
+              <div className="mt-7 flex flex-wrap gap-3">
+                <StatCard label="Prize / bull" value={`${PAYOUT_SOL} SOL`} accent="gold" />
+                <StatCard label="Bulls taken" value={`${reservedCount}/100`} accent="aqua" />
+                <StatCard
+                  label="Your status"
+                  value={hasPicked ? "Charging" : "Sidelined"}
+                  accent={hasPicked ? "mint" : "neutral"}
+                />
+              </div>
             </div>
 
-            {/* Stat cluster */}
-            <div className="flex gap-3">
-              <StatCard label="Prize / number" value={`${PAYOUT_SOL} SOL`} accent="gold" />
-              <StatCard label="Numbers taken" value={`${reservedCount}/100`} accent="aqua" />
-              <StatCard
-                label="Your status"
-                value={hasPicked ? "In play" : "Not in"}
-                accent={hasPicked ? "mint" : "neutral"}
+            {/* Ansem bull portrait */}
+            <div className="relative mx-auto w-full max-w-sm">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -inset-6 rounded-[2.5rem] bg-accent-gradient-soft blur-2xl"
               />
+              <div className="glass-strong relative overflow-hidden rounded-[2rem] p-2 shadow-glassLg">
+                <Image
+                  src="/ansem.png"
+                  alt="Ansem — the Bullotto bull"
+                  width={640}
+                  height={640}
+                  priority
+                  className="h-auto w-full rounded-[1.6rem]"
+                />
+                <div className="pointer-events-none absolute inset-0 rounded-[1.6rem] ring-1 ring-inset ring-white/10" />
+                <div className="absolute bottom-4 left-4 rounded-full border border-gold/30 bg-abyss/60 px-3 py-1 font-display text-xs font-semibold tracking-wide text-gold backdrop-blur-md">
+                  ANSEM · the bull
+                </div>
+              </div>
             </div>
           </div>
         </motion.section>
@@ -111,7 +137,7 @@ function PageInner() {
             <div className="glass rounded-3xl p-5 shadow-glass sm:p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="font-display text-lg font-semibold tracking-tight text-frost">
-                  The board
+                  The pit
                 </h2>
                 <span className="rounded-full border border-iris/25 bg-iris/10 px-2.5 py-0.5 font-display text-[11px] font-medium tracking-wide text-iris">
                   Holders only
@@ -138,7 +164,7 @@ function PageInner() {
 
             <div className="glass relative overflow-hidden rounded-3xl shadow-glass">
               <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full border border-white/10 bg-abyss/60 px-4 py-1 font-display text-xs font-medium tracking-wide text-mist backdrop-blur-md">
-                The drum
+                The arena
               </div>
               <div className="h-[420px] sm:h-[480px]">
                 <LottoMachine2D />

@@ -9,34 +9,37 @@ const config: Config = {
         body: ["var(--font-body)", "ui-sans-serif", "system-ui"],
       },
       colors: {
-        // Dark glass palette
-        abyss: "#070a14",
-        deep: "#0d1126",
-        haze: "rgba(255,255,255,0.06)",
-        hazeStrong: "rgba(255,255,255,0.10)",
-        // Accents
-        aqua: "#22d3ee",
-        iris: "#8b5cf6",
-        mint: "#34d399",
-        coral: "#fb7185",
-        gold: "#fbbf24",
+        // Bull-market coal palette
+        abyss: "#08080a",
+        deep: "#121116",
+        haze: "rgba(255,255,255,0.05)",
+        hazeStrong: "rgba(255,255,255,0.09)",
+        // Accents — repurposed for the Bullotto / Ansem theme.
+        // aqua = bull green (gains), iris = bronze horn, mint = lime "yours",
+        // gold = trophy horn, coral = charging-red urgency.
+        aqua: "#2fd576",
+        iris: "#c08b4f",
+        mint: "#a3e635",
+        coral: "#ff4d3d",
+        gold: "#f5b13d",
         // Text
-        frost: "#e7ecf5",
-        mist: "#8b93a7",
+        frost: "#f5f1e8",
+        mist: "#928d83",
       },
       backgroundImage: {
-        "accent-gradient": "linear-gradient(135deg, #22d3ee 0%, #8b5cf6 100%)",
+        "accent-gradient": "linear-gradient(135deg, #2fd576 0%, #f5b13d 100%)",
         "accent-gradient-soft":
-          "linear-gradient(135deg, rgba(34,211,238,0.16) 0%, rgba(139,92,246,0.16) 100%)",
-        "gold-gradient": "linear-gradient(135deg, #fde68a 0%, #f59e0b 100%)",
+          "linear-gradient(135deg, rgba(47,213,118,0.16) 0%, rgba(245,177,61,0.16) 100%)",
+        "gold-gradient": "linear-gradient(135deg, #ffe39a 0%, #f59e0b 100%)",
+        "bull-gradient": "linear-gradient(135deg, #2fd576 0%, #16a34a 100%)",
       },
       boxShadow: {
-        glass: "0 8px 32px rgba(0,0,0,0.35)",
-        glassLg: "0 16px 48px rgba(0,0,0,0.45)",
-        glowAqua: "0 0 24px rgba(34,211,238,0.30)",
-        glowIris: "0 0 24px rgba(139,92,246,0.30)",
-        glowGold: "0 0 28px rgba(251,191,36,0.40)",
-        glowMint: "0 0 20px rgba(52,211,153,0.35)",
+        glass: "0 8px 32px rgba(0,0,0,0.45)",
+        glassLg: "0 16px 48px rgba(0,0,0,0.55)",
+        glowAqua: "0 0 24px rgba(47,213,118,0.32)",
+        glowIris: "0 0 24px rgba(192,139,79,0.32)",
+        glowGold: "0 0 28px rgba(245,177,61,0.45)",
+        glowMint: "0 0 20px rgba(163,230,53,0.38)",
       },
       animation: {
         "pulse-gold": "pulse-gold 1.6s ease-in-out infinite",
@@ -47,8 +50,8 @@ const config: Config = {
       },
       keyframes: {
         "pulse-gold": {
-          "0%,100%": { boxShadow: "0 0 0 0 rgba(251,191,36,0.55)" },
-          "50%": { boxShadow: "0 0 26px 8px rgba(251,191,36,0.0)" },
+          "0%,100%": { boxShadow: "0 0 0 0 rgba(245,177,61,0.6)" },
+          "50%": { boxShadow: "0 0 26px 8px rgba(245,177,61,0.0)" },
         },
         float: {
           "0%,100%": { transform: "translateY(0px)" },

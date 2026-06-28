@@ -36,9 +36,9 @@ export function RoundTimer() {
   const sublabel = !round
     ? "Next round"
     : round.status === "completed"
-    ? "Winners below"
+    ? "Charging bulls below"
     : timeUp
-    ? "Drawing winners"
+    ? "Releasing the bulls"
     : "Time left";
 
   // Progress ring fraction (only meaningful while active).
@@ -81,8 +81,8 @@ export function RoundTimer() {
           />
           <defs>
             <linearGradient id="timer-grad" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#22d3ee" />
-              <stop offset="1" stopColor="#8b5cf6" />
+              <stop stopColor="#2fd576" />
+              <stop offset="1" stopColor="#f5b13d" />
             </linearGradient>
           </defs>
         </svg>
