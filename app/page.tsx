@@ -34,11 +34,11 @@ function PageInner() {
           <div className="flex items-center gap-3">
             <Image
               src="/logo.png"
-              alt="LOTTO"
-              width={36}
-              height={36}
+              alt="LOTTO 7"
+              width={40}
+              height={40}
               priority
-              className="h-9 w-9"
+              className="h-10 w-10 rounded-full"
             />
             <span className="font-display text-xl font-bold tracking-tight text-frost">LOTTO</span>
             <span className="hidden rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 font-display text-[11px] font-medium tracking-wide text-mist md:inline">
