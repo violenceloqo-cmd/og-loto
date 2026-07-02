@@ -98,18 +98,11 @@ export function ReservationModal({ n, onClose }: Props) {
       >
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full ring-2 ring-gold/50 shadow-glowGold">
-              <span
-                aria-hidden
-                className="absolute inset-0 bg-[url('/ansem-coin.png')] bg-cover bg-center"
-              />
-              <span aria-hidden className="absolute inset-0 bg-abyss/30" />
-              <span className="relative z-10 font-display text-xl font-extrabold text-white [text-shadow:_0_1px_3px_rgb(0_0_0_/_0.9)]">
-                {n}
-              </span>
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-gradient font-display text-xl font-bold text-abyss shadow-glowAqua">
+              {n}
             </span>
             <h2 className="font-display text-xl font-bold tracking-tight text-frost">
-              Claim your bull
+              Reserve number
             </h2>
           </div>
           <button
@@ -130,7 +123,7 @@ export function ReservationModal({ n, onClose }: Props) {
               </span>
               . We&apos;ll send your{" "}
               <span className="font-semibold text-gold">{PAYOUT_SOL} SOL</span> winnings to this
-              same wallet if your bull charges out of the pit.
+              same wallet if your number gets drawn.
             </p>
             <label className="mb-1.5 block font-display text-[11px] font-medium uppercase tracking-wider text-mist">
               Holding wallet
@@ -149,7 +142,7 @@ export function ReservationModal({ n, onClose }: Props) {
               disabled={holdingWallet.trim().length < 30 || !round || submitting}
               className="w-full rounded-xl bg-accent-gradient py-3.5 font-display text-base font-bold tracking-tight text-abyss shadow-glowAqua transition-all hover:opacity-90 hover:shadow-glowIris disabled:opacity-35 disabled:shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-aqua"
             >
-              {submitting ? "Checking…" : "Claim bull"}
+              {submitting ? "Checking…" : "Claim number"}
             </button>
             {!round && (
               <p className="mt-3 text-center text-xs text-mist">
@@ -157,7 +150,7 @@ export function ReservationModal({ n, onClose }: Props) {
               </p>
             )}
             <p className="mt-3 text-center text-[11px] text-mist/70">
-              One bull per wallet per round. No fees, no deposit — just hold the bag.
+              One pick per wallet per round. No fees, no deposit — just hold the bag.
             </p>
           </>
         )}
@@ -166,15 +159,15 @@ export function ReservationModal({ n, onClose }: Props) {
           <>
             <div className="mb-4 flex justify-center">
               <span className="flex h-16 w-16 animate-float items-center justify-center rounded-full bg-mint/15 text-3xl shadow-glowMint">
-                🐂
+                🎉
               </span>
             </div>
             <p className="mb-1 text-center font-display text-2xl font-bold tracking-tight text-frost">
-              Bull #{n} is yours
+              Number #{n} is yours
             </p>
             <p className="mb-5 text-center text-sm leading-relaxed text-mist">
-              Good luck — the stampede happens when the timer hits zero. If your bull charges,{" "}
-              {PAYOUT_SOL} SOL lands in your wallet automatically.
+              Good luck — drawing happens when the timer hits zero. If you win, {PAYOUT_SOL} SOL
+              lands in your wallet automatically.
             </p>
             <button
               onClick={onClose}

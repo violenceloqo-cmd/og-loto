@@ -6,39 +6,14 @@ interface Props {
   onPick: (n: number) => void;
 }
 
-interface Look {
-  tint: string;
-  ring: string;
-  num: string;
-  extra?: string;
-}
-
-function lookFor(num: PublicNumber, mine: boolean, isWinner: boolean): Look {
+function classFor(num: PublicNumber, mine: boolean, isWinner: boolean): string {
   if (isWinner)
-    return {
-      tint: "bg-gold/45",
-      ring: "ring-gold shadow-glowGold animate-pulse-gold",
-      num: "text-white",
-    };
+    return "bg-gold-gradient text-abyss font-bold shadow-glowGold animate-pulse-gold border-transparent";
   if (mine && num.status === "reserved")
-    return {
-      tint: "bg-mint/40",
-      ring: "ring-mint shadow-glowMint",
-      num: "text-white",
-    };
+    return "bg-mint/20 text-mint border-mint/40 shadow-glowMint";
   if (num.status === "reserved")
-    return {
-      tint: "bg-abyss/65 saturate-50",
-      ring: "ring-iris/40",
-      num: "text-white/70",
-      extra: "cursor-not-allowed",
-    };
-  return {
-    tint: "bg-abyss/45 group-hover:bg-abyss/15",
-    ring: "ring-white/15 group-hover:ring-aqua/70 group-hover:shadow-glowAqua",
-    num: "text-white",
-    extra: "group-hover:-translate-y-0.5",
-  };
+    return "bg-iris/15 text-iris/80 border-iris/25 cursor-not-allowed";
+  return "bg-white/[0.04] text-frost/80 border-white/10 hover:bg-aqua/15 hover:text-aqua hover:border-aqua/40 hover:shadow-glowAqua hover:-translate-y-0.5";
 }
 
 export function NumberGrid({ onPick }: Props) {
@@ -58,7 +33,7 @@ export function NumberGrid({ onPick }: Props) {
   });
 
   return (
-    <div className="grid grid-cols-10 gap-1.5 sm:gap-2.5">
+    <div className="grid grid-cols-10 gap-1.5 sm:gap-2">
       {slots.map((num, i) => {
         const n = i + 1;
         if (!num) {
@@ -67,17 +42,14 @@ export function NumberGrid({ onPick }: Props) {
               key={n}
               type="button"
               disabled
+              className={cn(
+                "aspect-square rounded-xl border font-display text-sm sm:text-base font-medium",
+                "flex items-center justify-center",
+                "bg-white/[0.02] text-mist/40 border-white/[0.05] cursor-not-allowed"
+              )}
               title="Waiting for the next round to start…"
-              className="group relative aspect-square overflow-hidden rounded-full ring-2 ring-white/10 cursor-not-allowed"
             >
-              <span
-                aria-hidden
-                className="absolute inset-0 bg-[url('/ansem-coin.png')] bg-cover bg-center opacity-40 saturate-0"
-              />
-              <span aria-hidden className="absolute inset-0 bg-abyss/70" />
-              <span className="relative z-10 flex h-full w-full items-center justify-center font-display text-base font-extrabold text-white/40 sm:text-lg">
-                {n}
-              </span>
+              {n}
             </button>
           );
         }
@@ -85,35 +57,21 @@ export function NumberGrid({ onPick }: Props) {
         const isWinner = winners.has(num.n);
         const taken = num.status !== "available";
         const disabled = taken || !canPick;
-        const look = lookFor(num, mine, isWinner);
         return (
           <button
             key={num.n}
             type="button"
             disabled={disabled}
             onClick={() => onPick(num.n)}
-            title={`Ansem bull #${num.n}`}
             className={cn(
-              "group relative aspect-square overflow-hidden rounded-full ring-2 transition-all duration-150",
+              "aspect-square rounded-xl border font-display text-sm sm:text-base font-medium transition-all duration-150",
+              "flex items-center justify-center",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-aqua",
-              look.ring,
-              look.extra
+              classFor(num, mine, isWinner),
+              disabled && !isWinner && !mine && "opacity-70"
             )}
           >
-            <span
-              aria-hidden
-              className="absolute inset-0 bg-[url('/ansem-coin.png')] bg-cover bg-center"
-            />
-            <span aria-hidden className={cn("absolute inset-0 transition-colors", look.tint)} />
-            <span
-              className={cn(
-                "relative z-10 flex h-full w-full items-center justify-center font-display text-base font-extrabold sm:text-lg",
-                "[text-shadow:_0_1px_4px_rgb(0_0_0_/_0.9)]",
-                look.num
-              )}
-            >
-              {num.n}
-            </span>
+            {num.n}
           </button>
         );
       })}

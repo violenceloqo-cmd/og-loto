@@ -37,21 +37,16 @@ type Live = {
   drawing: boolean;
 };
 
-// Each ball shows the Ansem bull portrait, with a status tint painted over it
-// and a colored rim. `tint` is a translucent wash so the picture stays visible.
 function ballColors(n: number, status: NumberStatus, mine: boolean, isWinner: boolean) {
-  if (isWinner) return { rim: "#f5b13d", tint: "rgba(245,177,61,0.42)", fill: "#3a2c10" };
-  if (mine && status === "reserved")
-    return { rim: "#a3e635", tint: "rgba(163,230,53,0.40)", fill: "#27330e" };
-  if (status === "reserved")
-    return { rim: "#8a6334", tint: "rgba(20,16,8,0.55)", fill: "#1a1206" };
-  // Available — alternating bronze / bull-green rims with a light dark wash so
-  // the number stays readable against the busy portrait.
+  if (isWinner) return { fill: "#fbbf24", rim: "#f59e0b", text: "#070a14" };
+  if (mine && status === "reserved") return { fill: "#34d399", rim: "#10b981", text: "#070a14" };
+  if (status === "reserved") return { fill: "#8b5cf6", rim: "#7c3aed", text: "#e7ecf5" };
+  // Available — alternate frosted blue-grey hues so the drum stays subtle.
   const cycle = n % 4;
-  if (cycle === 0) return { rim: "#7a6033", tint: "rgba(8,8,10,0.34)", fill: "#16160f" };
-  if (cycle === 1) return { rim: "#2f7d49", tint: "rgba(6,14,8,0.34)", fill: "#101410" };
-  if (cycle === 2) return { rim: "#c08b4f", tint: "rgba(12,9,4,0.34)", fill: "#1a160f" };
-  return { rim: "#2fd576", tint: "rgba(6,12,8,0.34)", fill: "#0f130f" };
+  if (cycle === 0) return { fill: "#1c2440", rim: "#2e3a5e", text: "#aeb8d0" };
+  if (cycle === 1) return { fill: "#202a4a", rim: "#34416a", text: "#aeb8d0" };
+  if (cycle === 2) return { fill: "#16324a", rim: "#22d3ee", text: "#7dd3e8" };
+  return { fill: "#241d44", rim: "#8b5cf6", text: "#b3a3e8" };
 }
 
 export function LottoMachine2D() {
@@ -92,14 +87,6 @@ export function LottoMachine2D() {
     if (!canvas || !wrap) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    // Ansem portrait painted inside every ball.
-    const bullImg = new window.Image();
-    bullImg.src = "/ansem-coin.png";
-    let bullReady = false;
-    bullImg.onload = () => {
-      bullReady = true;
-    };
 
     let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     let cw = 800;
@@ -155,7 +142,7 @@ export function LottoMachine2D() {
       const drumCx = cw / 2;
       const drumCy = ch * 0.42;
       const drumR = Math.min(cw * 0.42, ch * 0.42);
-      const ballR = Math.max(14, Math.min(18, drumR / 11));
+      const ballR = Math.max(12, Math.min(20, drumR / 14));
 
       // Pedestal positions at the bottom of the canvas (for fly-out).
       const pedY = ch - 56;
@@ -316,8 +303,8 @@ export function LottoMachine2D() {
       // Background flair: soft ambient glow behind the drum.
       ctx.save();
       const ambient = ctx.createRadialGradient(drumCx, drumCy, drumR * 0.2, drumCx, drumCy, drumR * 1.7);
-      ambient.addColorStop(0, "rgba(245, 177, 61, 0.14)");
-      ambient.addColorStop(0.55, "rgba(47, 213, 118, 0.06)");
+      ambient.addColorStop(0, "rgba(139, 92, 246, 0.14)");
+      ambient.addColorStop(0.55, "rgba(34, 211, 238, 0.06)");
       ambient.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = ambient;
       ctx.fillRect(0, 0, cw, ch);
@@ -337,8 +324,8 @@ export function LottoMachine2D() {
       ctx.beginPath();
       ctx.arc(0, 0, drumR + 10, 0, Math.PI * 2);
       const ringGrad = ctx.createLinearGradient(-drumR, -drumR, drumR, drumR);
-      ringGrad.addColorStop(0, "#2fd576");
-      ringGrad.addColorStop(1, "#f5b13d");
+      ringGrad.addColorStop(0, "#22d3ee");
+      ringGrad.addColorStop(1, "#8b5cf6");
       ctx.strokeStyle = ringGrad;
       ctx.lineWidth = 3;
       ctx.stroke();
@@ -370,7 +357,7 @@ export function LottoMachine2D() {
         const by = Math.sin(a) * (drumR + 10);
         ctx.beginPath();
         ctx.arc(bx, by, 2, 0, Math.PI * 2);
-        ctx.fillStyle = i % 2 === 0 ? "rgba(47,213,118,0.7)" : "rgba(245,177,61,0.7)";
+        ctx.fillStyle = i % 2 === 0 ? "rgba(34,211,238,0.7)" : "rgba(139,92,246,0.7)";
         ctx.fill();
       }
 
@@ -409,8 +396,8 @@ export function LottoMachine2D() {
         ctx.translate(ped.x, ped.y + 22);
         // glow base
         const slotGlow = ctx.createRadialGradient(0, 4, 0, 0, 4, baseHalf + 8);
-        slotGlow.addColorStop(0, "rgba(245,177,61,0.22)");
-        slotGlow.addColorStop(1, "rgba(245,177,61,0)");
+        slotGlow.addColorStop(0, "rgba(34,211,238,0.22)");
+        slotGlow.addColorStop(1, "rgba(34,211,238,0)");
         ctx.fillStyle = slotGlow;
         ctx.beginPath();
         ctx.ellipse(0, 4, baseHalf + 8, 8, 0, 0, Math.PI * 2);
@@ -439,54 +426,36 @@ export function LottoMachine2D() {
         ctx.fillStyle = "rgba(0,0,0,0.45)";
         ctx.fill();
 
-        // Body — Ansem portrait clipped into the ball, with a status tint.
-        ctx.save();
+        // Body
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-        ctx.closePath();
         ctx.fillStyle = colors.fill;
         ctx.fill();
-        if (bullReady) {
-          ctx.clip();
-          const d = b.r * 2;
-          // Crop a centered square from the source so the wide coin art maps
-          // into the round ball without stretching.
-          const iw = bullImg.naturalWidth || d;
-          const ih = bullImg.naturalHeight || d;
-          const s = Math.min(iw, ih);
-          const sx = (iw - s) / 2;
-          const sy = (ih - s) / 2;
-          ctx.drawImage(bullImg, sx, sy, s, s, b.x - b.r, b.y - b.r, d, d);
-          ctx.fillStyle = colors.tint;
-          ctx.fillRect(b.x - b.r, b.y - b.r, d, d);
-        }
-        ctx.restore();
-
-        // Rim
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 2;
         ctx.strokeStyle = colors.rim;
+        ctx.stroke();
+
+        // Inner ring (lotto-ball style)
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r * 0.7, 0, Math.PI * 2);
+        ctx.strokeStyle = colors.rim;
+        ctx.lineWidth = 1.2;
         ctx.stroke();
 
         // Highlight shine
         ctx.beginPath();
-        ctx.ellipse(b.x - b.r * 0.35, b.y - b.r * 0.42, b.r * 0.3, b.r * 0.16, -0.5, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.22)";
+        ctx.ellipse(b.x - b.r * 0.35, b.y - b.r * 0.4, b.r * 0.32, b.r * 0.18, -0.5, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.30)";
         ctx.fill();
 
-        // Number — white with a dark stroke so it reads over the portrait.
+        // Number
         ctx.save();
         ctx.translate(b.x, b.y);
         ctx.rotate(b.flying ? b.rotation * 0.15 : Math.sin(b.rotation) * 0.08);
-        ctx.font = `800 ${Math.floor(b.r * 1.2)}px var(--font-display), ui-monospace, monospace`;
+        ctx.fillStyle = colors.text;
+        ctx.font = `bold ${Math.floor(b.r * 1.15)}px var(--font-display), ui-monospace, monospace`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.lineWidth = Math.max(2.5, b.r * 0.22);
-        ctx.strokeStyle = "rgba(0,0,0,0.85)";
-        ctx.lineJoin = "round";
-        ctx.strokeText(String(b.n), 0, 1);
-        ctx.fillStyle = "#ffffff";
         ctx.fillText(String(b.n), 0, 1);
         ctx.restore();
 
@@ -495,9 +464,9 @@ export function LottoMachine2D() {
           ctx.save();
           ctx.beginPath();
           ctx.arc(b.x, b.y, b.r + 4 + Math.sin(now * 0.01) * 2, 0, Math.PI * 2);
-          ctx.strokeStyle = "rgba(245, 177, 61, 0.85)";
+          ctx.strokeStyle = "rgba(251, 191, 36, 0.85)";
           ctx.lineWidth = 2.5;
-          ctx.shadowColor = "rgba(245, 177, 61, 0.6)";
+          ctx.shadowColor = "rgba(251, 191, 36, 0.6)";
           ctx.shadowBlur = 12;
           ctx.stroke();
           ctx.restore();

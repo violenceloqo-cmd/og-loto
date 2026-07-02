@@ -18,8 +18,8 @@ const body = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "BULLOTTO — Ansem's Provably Fair Solana Bull Lottery",
-  description: `Run with the bulls. Live Solana lottery — 5-minute rounds, 100 Ansem bulls, hold ${MIN_TOKEN_HOLDING_UI.toLocaleString()} $${TOKEN_TICKER} to charge, ${PAYOUT_SOL} SOL per winning bull.`,
+  title: "LOTTO — Provably Fair Solana Lottery",
+  description: `Live Solana lottery — 5-minute rounds, 100 numbers, hold ${MIN_TOKEN_HOLDING_UI.toLocaleString()} $${TOKEN_TICKER} to play, ${PAYOUT_SOL} SOL per winning number.`,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

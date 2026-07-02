@@ -1,6 +1,6 @@
-# BULLOTTO — Ansem's Bull Lottery
+# Lotto Coin
 
-Run with the bulls. A live Solana lottery fronted by **Ansem**, the Bullotto bull. 5-minute rounds. 100 Ansem bulls. **Token-gated entry** — hold at least `LOTTO_MIN_TOKEN_AMOUNT_UI` (default 100,000) $BULLOTTO in your wallet to claim a bull. 5 winning bulls charge out of a finalized Solana blockhash. Each winner is paid automatically from a treasury wallet to the same wallet that proved the token holding.
+Live Solana lottery. 5-minute rounds. 100 numbers. **Token-gated entry** — hold at least `LOTTO_MIN_TOKEN_AMOUNT_UI` (default 100,000) of the project SPL token in your wallet to pick a number. 5 winning balls drawn from a finalized Solana blockhash. Each winner is paid 0.2 SOL automatically from a treasury wallet to the same wallet that proved the token holding.
 
 ## How a round works
 

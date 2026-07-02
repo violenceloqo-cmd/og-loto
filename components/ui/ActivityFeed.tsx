@@ -105,7 +105,7 @@ function EmptyState({ children }: { children: React.ReactNode }) {
 
 function CurrentTab({ feed }: { feed: FeedEntry[] }) {
   if (feed.length === 0) {
-    return <EmptyState>No bulls claimed yet — be the first to charge</EmptyState>;
+    return <EmptyState>No picks yet — be the first</EmptyState>;
   }
   // Winners first, then newest reservations.
   const sorted = feed.slice().sort((a, b) => {
@@ -154,7 +154,7 @@ function PastRoundGroup({ round }: { round: PastRound }) {
         <div className="font-display text-sm font-semibold text-frost">Round #{round.id}</div>
         <div className="flex items-center gap-2">
           <span className="rounded-full border border-mint/25 bg-mint/10 px-2 py-0.5 font-display text-[10px] font-medium tracking-wide text-mint">
-            {winnerCount} charged
+            {winnerCount} winners
           </span>
           {round.draw_blockhash && (
             <a
@@ -172,7 +172,7 @@ function PastRoundGroup({ round }: { round: PastRound }) {
       {round.winning_numbers && round.winning_numbers.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 border-b border-white/[0.05] px-3 py-2">
           <span className="mr-1 font-display text-[10px] font-medium uppercase tracking-wider text-mist">
-            Winning bulls
+            Winning numbers
           </span>
           {round.winning_numbers.map((n) => (
             <span
@@ -193,7 +193,7 @@ function PastRoundGroup({ round }: { round: PastRound }) {
         </ul>
       ) : (
         <div className="px-3 py-3 text-center font-display text-[11px] font-medium tracking-wide text-mist/60">
-          No bulls this round
+          No picks this round
         </div>
       )}
     </div>

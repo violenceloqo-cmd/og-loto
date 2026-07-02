@@ -52,7 +52,7 @@ export function RulesInfoModal({ onClose }: { onClose: () => void }) {
         </span>
 
         <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-frost">
-          How <span className="text-accent-gradient">BULLOTTO</span> works
+          How <span className="text-accent-gradient">LOTTO</span> works
         </h2>
 
         <div className="mt-6 space-y-5 text-sm leading-relaxed text-mist">
@@ -66,11 +66,11 @@ export function RulesInfoModal({ onClose }: { onClose: () => void }) {
                 </b>{" "}
                 in a Solana wallet.
               </li>
-              <li>Tap any available bull on the 100-bull pit.</li>
+              <li>Tap any available number on the 100-number board.</li>
               <li>Paste the holding wallet to claim it — no fee, no deposit, no signature.</li>
               <li>
-                Every <b className="text-frost">5 minutes</b> a new round stampedes{" "}
-                <b className="text-frost">5 winning bulls</b> from a Solana blockhash (provably
+                Every <b className="text-frost">5 minutes</b> a new round draws{" "}
+                <b className="text-frost">5 winning numbers</b> from a Solana blockhash (provably
                 random).
               </li>
               <li>
@@ -90,7 +90,7 @@ export function RulesInfoModal({ onClose }: { onClose: () => void }) {
             </p>
             <p className="mt-2">
               At launch, <b className="text-frost">1 SOL</b> is paid out every 5 minutes (split
-              across the round&apos;s 5 winning bulls). As the token grows, payouts scale up at
+              across the round&apos;s 5 winning numbers). As the token grows, payouts scale up at
               fixed market-cap milestones:
             </p>
           </section>
@@ -129,18 +129,18 @@ export function RulesInfoModal({ onClose }: { onClose: () => void }) {
           <section className="rounded-2xl border border-mint/20 bg-mint/[0.05] p-5">
             <h3 className="mb-2 font-display text-base font-semibold text-mint">Fair play</h3>
             <ul className="list-disc space-y-1.5 pl-5">
-              <li>One bull per wallet per round.</li>
-              <li>Bulls are first-come, first-served.</li>
-              <li>Winning bulls are derived from a public Solana blockhash — fully verifiable.</li>
+              <li>One number per wallet per round.</li>
+              <li>Numbers are first-come, first-served.</li>
+              <li>Winning numbers are derived from a public Solana blockhash — fully verifiable.</li>
               <li>
                 If you sell below {MIN_TOKEN_HOLDING_UI.toLocaleString()} ${TOKEN_TICKER} before the
-                stampede, your bull is voided.
+                draw, your pick is voided.
               </li>
             </ul>
           </section>
 
           <p className="pt-1 text-center font-display text-xs font-medium tracking-wide text-mist">
-            Hold ${TOKEN_TICKER} · Claim a bull · Win SOL · Every 5 minutes
+            Hold ${TOKEN_TICKER} · Pick a number · Win SOL · Every 5 minutes
           </p>
         </div>
       </div>
